@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TodoWhere</string>
+    <string name="add_todo">일정 추가</string>
+    <string name="done">완료</string>
+    <string name="location">MAP</string>
+    <string name="menu">MENU</string>
 </resources>

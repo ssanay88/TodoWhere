@@ -3,7 +3,6 @@ plugins {
     id 'kotlin-android'
     // Realm 플러그인, 순서 주의
     id 'kotlin-kapt'
-
     id 'realm-android'
 }
 
@@ -13,6 +12,10 @@ android {
 
     buildFeatures {
         viewBinding = true
+    }
+
+    realm {
+        syncEnabled = true
     }
 
     defaultConfig {

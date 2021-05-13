@@ -7,7 +7,7 @@ import io.realm.annotations.PrimaryKey
 open class Todo (
     // id, 무엇을 할지, 언제, 어디서 할지
     @PrimaryKey var id: Long = 0 ,
-    var what_todo: String = "" ,
-    var date: Long = 0 ,
-    var where_todo: String = ""
+    var what: String = "" ,
+    var time: Long = 0 ,
+    var where: String = ""
 )  : RealmObject() {}

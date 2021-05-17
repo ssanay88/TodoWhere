@@ -2,13 +2,23 @@ package com.example.todowhere
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.todowhere.databinding.ActivityMainBinding
 import io.realm.Realm
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        val mainBinding  =  ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mainBinding.root)
+
+
+
+        mainBinding.TodoRecyclerView.adapter = MyAdapter()
+        mainBinding.TodoRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     // Realm 데이터 베이스
@@ -22,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     var selected_year = calendar.get(Calendar.YEAR)
     var selected_month = calendar.get(Calendar.MONTH)
     var selected_day = calendar.get(Calendar.DAY_OF_MONTH)
+
+
 
 
 

@@ -4,9 +4,12 @@ import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.TimePicker
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import io.realm.Realm
 import io.realm.kotlin.createObject
+import org.jetbrains.anko.timePicker
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AddTodoActivity : AppCompatActivity() {
@@ -32,7 +35,17 @@ class AddTodoActivity : AppCompatActivity() {
 
         // 타임피커 만들어야함 05 13
         addTodoBinding.TimeButton.setOnClickListener {
-            TimePickerDialog(this, TimePickerDialog.OnTimeSetListener(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
+
+            val cal = Calendar.getInstance()
+
+            val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
+                cal.set(Calendar.HOUR_OF_DAY, hour)
+                cal.set(Calendar.MINUTE, minute)
+
+                addTodoBinding.TimeButton.text = SimpleDateFormat("HH:mm").format(cal.time)
+            }
+
+            TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
         }
 
 
@@ -53,11 +66,11 @@ class AddTodoActivity : AppCompatActivity() {
         // 값 설정
         newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
         // 캘린더에서 받아온 날짜 넣어주기
-        newItem.time =
+        newItem.time = calendar.timeInMillis
         // 지도에서 받아온 주소 넣어주기
         // newItem.where_todo =
 
-        realm.commitTransaction()   // 트랜잭션 종료 반영
+        // realm.commitTransaction()   // 트랜잭션 종료 반영
 
     }
 

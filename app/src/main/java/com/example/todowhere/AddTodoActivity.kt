@@ -36,6 +36,7 @@ class AddTodoActivity : AppCompatActivity() {
         // 타임피커 만들어야함 05 13
         addTodoBinding.TimeButton.setOnClickListener {
 
+
             val cal = Calendar.getInstance()
 
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
@@ -46,6 +47,12 @@ class AddTodoActivity : AppCompatActivity() {
             }
 
             TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }
+
+
+        // 지도 불러와서 위치 넣어주기
+        addTodoBinding.MapButton.setOnClickListener {
+            //
         }
 
 

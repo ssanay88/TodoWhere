@@ -25,6 +25,7 @@ class MyViewHolder2(view:View) : RecyclerView.ViewHolder(view) {
 
     init {
         Log.d(TAG,"MyViewHolder2 called!!")
+
     }
 
 }

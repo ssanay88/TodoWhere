@@ -16,10 +16,10 @@ class MyAdapter : RecyclerView.Adapter<MyViewHolder2>() {
     // 뷰홀더가 생성될때
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder2 {
         // 연결할 레이아웃 설정
-        //val view = LayoutInflater.from(parent.context).inflate(R.layout.add_todo, parent, false)
-        //return MyViewHolder2(view)
-        //val add_todo_binding = AddTodoBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        //return MyViewHolder2(add_todo_binding)
+//        val view = LayoutInflater.from(parent.context).inflate(R.layout.add_todo, parent, false)
+//        return MyViewHolder2(view)
+//        val add_todo_binding = AddTodoBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+//        return MyViewHolder2(add_todo_binding)
 
         /*
         val binding = TodoListBinding

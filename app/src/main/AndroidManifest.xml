@@ -11,6 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoWhere">
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="qc5x10r84y"/>
         <activity android:name=".AddTodoActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>

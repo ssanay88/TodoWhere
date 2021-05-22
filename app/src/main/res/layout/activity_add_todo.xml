@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/mapView"
-        app:layout_constraintBottom_totopOf="@+id/mapView"
+        
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/whatTodo">
@@ -65,8 +65,9 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.gms.maps.MapView
+    <fragment
         android:id="@+id/mapView"
+        android:name="com.naver.maps.map.MapFragment"
         android:layout_width="361dp"
         android:layout_height="340dp"
         android:layout_marginStart="32dp"

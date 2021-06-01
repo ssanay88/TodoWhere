@@ -11,7 +11,6 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val mainBinding  =  ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 

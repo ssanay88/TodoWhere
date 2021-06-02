@@ -107,7 +107,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-
+    // Realm DB에 데이터 추가
     private fun insertTodo() {
 
         realm.beginTransaction()    // 트랜잭션 시작

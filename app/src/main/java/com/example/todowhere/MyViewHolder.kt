@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todowhere.databinding.TodoListBinding
 import io.realm.Realm
 
+// todo_list.xml 파일과 연결 즉, 만들어진 계획을 보여주는 레이아웃
 class MyViewHolder1(val binding: TodoListBinding) : RecyclerView.ViewHolder(binding.root) {
 
     // Realm 인스턴스

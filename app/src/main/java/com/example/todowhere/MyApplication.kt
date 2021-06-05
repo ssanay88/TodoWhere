@@ -1,6 +1,7 @@
 package com.example.todowhere
 
 import android.app.Application
+import android.content.Context
 import io.realm.Realm
 // Application 클래스를 상속받는 MyApplication 선언
 class MyApplication : Application() {
@@ -9,5 +10,16 @@ class MyApplication : Application() {
         super.onCreate()
         // Realm.init() 메서드를 사용하여 초기화
         Realm.init(this)
+    }
+
+    init {
+        instance = this
+    }
+
+    companion object {
+        lateinit var instance: MyApplication
+        fun ApplicationContext() : Context {
+            return instance.applicationContext
+        }
     }
 }

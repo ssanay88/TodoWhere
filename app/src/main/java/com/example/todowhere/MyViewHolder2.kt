@@ -37,22 +37,16 @@ class MyViewHolder2(view:View) : RecyclerView.ViewHolder(view) {
 
     val TAG: String = "로그"
 
-    private val addBtn: Button = view.findViewById(R.id.todo_add_button)
+    val addBtn: Button = view.findViewById(R.id.todo_add_button)
+
 
     init {
         Log.d(TAG, "MyViewHolder2 called!!")
     }
 
     fun bind() {
-        addBtn.setOnClickListener {
-            Log.d(TAG, "일정 추가 버튼 클릭")
+        // 데이터 묶는 곳
 
-            // 일정 추가 버튼 클릭 시 add_todo 파일로 가서 작성
-            val intent : Intent = Intent(MyApplication.ApplicationContext(), AddTodoActivity::class.java)
-
-
-
-        }
 
     }
 }

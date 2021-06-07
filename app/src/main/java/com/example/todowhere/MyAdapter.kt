@@ -1,17 +1,24 @@
 package com.example.todowhere
 
+import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todowhere.databinding.AddTodoBinding
 import com.example.todowhere.databinding.TodoListBinding
 
-class MyAdapter : RecyclerView.Adapter<MyViewHolder2>() {
+class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyViewHolder2>() {
 
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
         return super.getItemViewType(position)
     }
+
 
     // 뷰홀더가 생성될때
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder2 {
@@ -32,7 +39,16 @@ class MyAdapter : RecyclerView.Adapter<MyViewHolder2>() {
     // 뷰홀더가 재활용 됐을 때때
    override fun onBindViewHolder(holder: MyViewHolder2, position: Int) {
 
-       holder.bind()
+        holder.bind()
+
+        holder.addBtn.setOnClickListener {
+            Log.d(TAG, "일정 추가 버튼 클릭")
+
+            // 일정 추가 버튼 클릭 시 add_todo 파일로 가서 작성 06.07
+            val intent = Intent(context, AddTodoActivity::class.java)
+            startActivity(context, intent, null)
+
+        }
 
     }
 

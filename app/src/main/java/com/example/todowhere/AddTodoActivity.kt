@@ -28,12 +28,11 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     val calendar : Calendar = Calendar.getInstance()    // 캘린더 인스턴스 얻기
 
 
-    // var selected_year = calendar.get(Calendar.YEAR)
-    // var selected_month = calendar.get(Calendar.MONTH)
-    // var selected_day = calendar.get(Calendar.DAY_OF_MONTH)
+    var intent_from_mainactivity = getIntent()
+
+    var now_date = intent_from_mainactivity.getStringExtra("DATE")
 
     var selected_date = calendar.timeInMillis.toString()
-
     var goal_time = 0       // 목표 시간
 
 
@@ -82,6 +81,16 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
+        // 등록 버튼 클릭 시 해당 데이터 등록
+        addTodoBinding.AddButton.setOnClickListener {
+
+            insertTodo()
+
+
+
+        }
+
+
     }
 
     override fun onDestroy() {
@@ -105,7 +114,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
+    // 06.21 입력 받은 날짜를 기준으로 id 생성 후 입력 받은 값들 realm DB 등록해주기
 
     // Realm DB에 데이터 추가
     private fun insertTodo() {

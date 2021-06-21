@@ -1,10 +1,12 @@
 package com.example.todowhere
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
 import io.realm.Realm
 import java.text.DateFormat
@@ -29,6 +31,15 @@ class MainActivity : AppCompatActivity() {
         val mainBinding  =  ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 
+        // 리사이클러뷰 관련 선언
+        // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
+        val myAdapter = MyAdapter(this)
+        mainBinding.TodoRecyclerView.adapter = myAdapter
+
+        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
+        val layout = LinearLayoutManager(this)
+        mainBinding.TodoRecyclerView.layoutManager = layout
+
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
        mainBinding.CalendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
@@ -40,11 +51,19 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG,"오늘 날짜는 $year - ${month+1} - $dayOfMonth 입니다.")
         }
 
-        // 06.02 날짜를 yyyy/MM/dd 형태로 다음 인텐트로 전달하기 X -> yyyyMdd형태
 
-        mainBinding.TodoRecyclerView.adapter = MyAdapter()
-        mainBinding.TodoRecyclerView.layoutManager = LinearLayoutManager(this)
-    }
+        // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
+        myAdapter.setonBtnClickListener(object : MyAdapter.onBtnClickListener{
+            // onBtnClick 오버라이드 정의
+            override fun onBtnClick() {
+                var intent = Intent(this@MainActivity, AddTodoActivity::class.java).apply {
+                    // 선택한 날짜 넘겨주기
+                    putExtra("DATE", selected_date)
+                }
+                startActivity(intent)
+            }
+        })
+
 
     // Realm 데이터 베이스
     val realm = Realm.getDefaultInstance()  // Realm 객체 초기화

@@ -17,7 +17,7 @@ import com.example.todowhere.databinding.TodoListBinding
 import io.realm.Realm
 import org.w3c.dom.Text
 
-class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyViewHolder2>() {
+class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
 
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
@@ -46,15 +46,6 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyViewHolde
 
         holder.bind()
 
-        holder.addBtn.setOnClickListener {
-            Log.d(TAG, "일정 추가 버튼 클릭")
-
-            // 일정 추가 버튼 클릭 시 add_todo 파일로 가서 작성 06.07
-            val intent = Intent(context, AddTodoActivity::class.java)
-            startActivity(context, intent, null)
-
-        }
-
     }
 
     // 인터페이스
@@ -68,9 +59,9 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyViewHolde
         this.listener = listener
     }
 
-    // 목록의 아이템 개수
+    // 목록에서 보여줄 아이템 개수
     override fun getItemCount(): Int {
-        return 1
+        return 3
     }
 
 
@@ -105,13 +96,11 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyViewHolde
 
         val addBtn: Button = view.findViewById(R.id.todo_add_button)
 
-
         init {
             Log.d(TAG, "MyViewHolder2 called!!")
         }
 
         fun bind() {
-
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
                 listener?.onBtnClick()
@@ -120,29 +109,6 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyViewHolde
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

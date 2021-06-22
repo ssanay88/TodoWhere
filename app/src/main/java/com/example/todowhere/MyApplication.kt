@@ -12,14 +12,14 @@ class MyApplication : Application() {
         Realm.init(this)
     }
 
-    init {
-        instance = this
-    }
-
-    companion object {
-        lateinit var instance: MyApplication
-        fun ApplicationContext() : Context {
-            return instance.applicationContext
-        }
-    }
+//    init {
+//        instance = this
+//    }
+//
+//    companion object {
+//        lateinit var instance: MyApplication
+//        fun ApplicationContext() : Context {
+//            return instance.applicationContext
+//        }
+//    }
 }

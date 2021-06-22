@@ -16,6 +16,7 @@ import io.realm.Realm
 import io.realm.kotlin.createObject
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.min
 
 class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -25,14 +26,14 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
 
     val realm = Realm.getDefaultInstance()  // 인스턴스 얻기
-    val calendar : Calendar = Calendar.getInstance()    // 캘린더 인스턴스 얻기
+    // val calendar : Calendar = Calendar.getInstance()    // 캘린더 인스턴스 얻기
 
-
+    // MainActivity 에서 인텐트를 전달받기 위해 선언
     var intent_from_mainactivity = getIntent()
-
+    // 전달 받은 날짜와 시간 저장
     var now_date = intent_from_mainactivity.getStringExtra("DATE")
+    var now_time = intent_from_mainactivity.getStringExtra("TIME")
 
-    var selected_date = calendar.timeInMillis.toString()
     var goal_time = 0       // 목표 시간
 
 
@@ -83,11 +84,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 등록 버튼 클릭 시 해당 데이터 등록
         addTodoBinding.AddButton.setOnClickListener {
-
             insertTodo()
-
-
-
         }
 
 
@@ -122,7 +119,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         realm.beginTransaction()    // 트랜잭션 시작
 
         // 객체 생성
-        val newItem = realm.createObject<Todo>("selected_date")
+        // id는 캘린더에서 선택한 날짜와 당시 시간으로 설정정
+       val newItem = realm.createObject<Todo>(now_date + now_time)
         // 값 설정
         newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
         // 캘린더에서 받아온 날짜 넣어주기
@@ -133,8 +131,6 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         realm.commitTransaction()   // 트랜잭션 종료 반영
 
     }
-
-
 
 
 }

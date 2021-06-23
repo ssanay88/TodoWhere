@@ -39,7 +39,6 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         addTodoBinding = ActivityAddTodoBinding.inflate(layoutInflater)
         val view = addTodoBinding.root
         setContentView(view)

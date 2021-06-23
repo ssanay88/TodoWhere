@@ -20,19 +20,17 @@ import org.w3c.dom.Text
 class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
 
     // xml을 여러개 사용하려고 할 때
-    override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
-    }
+//    override fun getItemViewType(position: Int): Int {
+//        return super.getItemViewType(position)
+//    }
 
 
     // 뷰홀더가 생성될때
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder2 {
         // 연결할 레이아웃 설정
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.add_todo, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.add_todo, parent, false)
         return MyViewHolder2(view)
 
-//        val add_todo_binding = AddTodoBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-//        return MyViewHolder2(add_todo_binding)
 
         /*
         val binding = TodoListBinding
@@ -103,13 +101,12 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
         fun bind() {
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
+                Log.d(TAG,"뷰 홀더에서 클릭 이벤트!!")
                 listener?.onBtnClick()
             }
 
         }
 
     }
-
-
 
 }

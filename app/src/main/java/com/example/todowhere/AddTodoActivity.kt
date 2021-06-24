@@ -21,6 +21,8 @@ import kotlin.math.min
 
 class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private val TAG = "로그"
+
     private lateinit var addTodoBinding: ActivityAddTodoBinding
 
     private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
@@ -28,20 +30,27 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     val realm = Realm.getDefaultInstance()  // 인스턴스 얻기
     // val calendar : Calendar = Calendar.getInstance()    // 캘린더 인스턴스 얻기
 
-    // MainActivity 에서 인텐트를 전달받기 위해 선언
-    var intent_from_mainactivity = getIntent()
-    // 전달 받은 날짜와 시간 저장
-    var now_date = intent_from_mainactivity.getStringExtra("DATE")
-    var now_time = intent_from_mainactivity.getStringExtra("TIME")
-
     var goal_time = 0       // 목표 시간
+
+    lateinit var now_date : String
+    lateinit var now_time : String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         addTodoBinding = ActivityAddTodoBinding.inflate(layoutInflater)
         val view = addTodoBinding.root
         setContentView(view)
+
+
+
+        // MainActivity 에서 인텐트를 전달받기 위해 선언
+        var intent_from_mainactivity = getIntent()
+
+        // 전달 받은 날짜와 시간 저장
+        now_date = intent_from_mainactivity.getStringExtra("DATE")!!
+        now_time = intent_from_mainactivity.getStringExtra("TIME")!!
 
 
         // 네이버 지도 프래그먼트
@@ -56,6 +65,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // getMapAsync를 호출하여 비동기로 onMapReady 콜백 메서드 호출
         // onMapReady에서 NaverMap 객체를 받음
         mapFragment.getMapAsync(this)
+
+        Log.d(TAG,"AddTodo 액티비티 시작!!")
 
 
 

@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         selected_year.toString() + selected_month.toString() + selected_day.toString()
 
     // real DB에서 사용할 id를 위한 현재 시간 변수
-    var cur_time = Date().time!!
+    var cur_time = Date().time
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
 
                 var next_intent = Intent(this@MainActivity, AddTodoActivity::class.java).apply {
                     // 선택한 날짜 넘겨주기
+                    Log.d(TAG,"선택한 날짜 : $selected_date")
+                    Log.d(TAG,"선택한 시간 : $cur_time_form")
                     putExtra("DATE", selected_date)
                     putExtra("TIME", cur_time_form)
                 }

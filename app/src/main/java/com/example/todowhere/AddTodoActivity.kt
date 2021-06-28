@@ -107,10 +107,9 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     // NaverMap 객체가 준비되면 onMapReady() 콜백 메서드가 호출됩니다.
-    override fun onMapReady(p0: NaverMap) {
+    override fun onMapReady(naverMap : NaverMap) {
         // 마커 객체 생성 및 지도에 추가
         val marker = Marker()
-
 
         // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
         naverMap.setOnMapClickListener { pointF, coord ->
@@ -136,7 +135,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 캘린더에서 받아온 날짜 넣어주기
         newItem.time = goal_time.toLong()
         // 지도에서 받아온 주소 넣어주기
-         newItem.where = "우리집"
+        newItem.where = "우리집"
 
         realm.commitTransaction()   // 트랜잭션 종료 반영
 

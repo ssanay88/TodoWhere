@@ -3,6 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.todowhere">
 
+    <!-- 현재 위치를 불러오기 위한 권한 요청  -->
+    <!-- 도시 블럭 내의 위치 정확성 제공   -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 위보다 좀 더 정확한 위치 제공  -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 인터넷 사용 허가    -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"

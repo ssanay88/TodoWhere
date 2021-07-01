@@ -1,5 +1,7 @@
 package com.example.todowhere
 
+import com.naver.maps.geometry.LatLngBounds
+import com.naver.maps.map.overlay.CircleOverlay
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
@@ -9,5 +11,5 @@ open class Todo (
     @PrimaryKey var id: String = "" ,
     var what: String = "" ,
     var time: Long = 0 ,
-    var where: String = ""
+    var where: LatLngBounds ?= null
 )  : RealmObject() {}

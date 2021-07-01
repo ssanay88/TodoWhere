@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
+
+
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.

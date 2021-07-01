@@ -1,16 +1,20 @@
 package com.example.todowhere
 
 import android.app.TimePickerDialog
+import android.graphics.Color.GREEN
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.widget.Toast
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import io.realm.Realm
 import io.realm.kotlin.createObject
@@ -32,9 +36,10 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     var goal_time = 0       // 목표 시간
 
-    lateinit var now_date : String
-    lateinit var now_time : String
+    lateinit var now_date : String  // 선택된 날짜
+    lateinit var now_time : String  // 선택했을 시간 - id용
 
+    lateinit var selected_bounds: LatLngBounds
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -97,6 +102,16 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             insertTodo()
         }
 
+        // MAP 버튼 클릭 시 위치 등록
+        addTodoBinding.MapButton.setOnClickListener {
+            if ( selected_bounds != null) {
+                // 주소로 변경 - 네이버 reverse geocoding API 사용
+            }
+            else {
+                Toast.makeText(this, "지도에서 목적지를 선택하여 주십시오", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
     }
 
@@ -111,11 +126,21 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 마커 객체 생성 및 지도에 추가
         val marker = Marker()
 
+        val circle = CircleOverlay()
+
         // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
         naverMap.setOnMapClickListener { pointF, coord ->
+            // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
             marker.position = LatLng( coord.latitude , coord.longitude )
             marker.map = naverMap
-            // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
+            circle.center = LatLng( coord.latitude , coord.longitude )
+            circle.radius = 20.0
+            circle.outlineWidth = 10
+            circle.outlineColor = GREEN
+            circle.color = 0
+            circle.map = naverMap
+            // 선택된 좌표 기준 범위 설정
+            selected_bounds = circle.bounds
 
         }
     }
@@ -128,14 +153,16 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         realm.beginTransaction()    // 트랜잭션 시작
 
         // 객체 생성
-        // id는 캘린더에서 선택한 날짜와 당시 시간으로 설정정
-       val newItem = realm.createObject<Todo>(now_date + now_time)
-        // 값 설정
+        // id는 캘린더에서 선택한 날짜와 당시 시간으로 설정
+        val newItem = realm.createObject<Todo>(now_date + now_time)
+        // 무엇을 할지 설정
         newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
-        // 캘린더에서 받아온 날짜 넣어주기
+        // 목표 달성 시간 넣어주기
         newItem.time = goal_time.toLong()
-        // 지도에서 받아온 주소 넣어주기
-        newItem.where = "우리집"
+        // 지도에서 받아온 목표 범위위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가
+        newItem.where = selected_bounds
+
+        Log.d(TAG,"ID : ${now_date + now_time}  // Todo : ${newItem.what}  // Time : ${newItem.time} ")
 
         realm.commitTransaction()   // 트랜잭션 종료 반영
 

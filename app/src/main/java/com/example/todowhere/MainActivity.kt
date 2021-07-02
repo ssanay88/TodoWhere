@@ -9,6 +9,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
+import com.naver.maps.map.overlay.CircleOverlay
 import io.realm.Realm
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     // real DB에서 사용할 id를 위한 현재 시간 변수
     var cur_time = Date().time
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // Realm 데이터 베이스
-        val realm = Realm.getDefaultInstance()  // Realm 객체 초기화
+        // val realm = Realm.getDefaultInstance()  // Realm 객체 초기화
 
 
     }

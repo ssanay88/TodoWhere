@@ -1,12 +1,17 @@
 package com.example.todowhere
 
 import android.app.TimePickerDialog
+import android.content.Context
 import android.graphics.Color.GREEN
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.geometry.LatLngBounds
@@ -16,6 +21,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import java.text.SimpleDateFormat
@@ -39,7 +45,11 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var now_date : String  // 선택된 날짜
     lateinit var now_time : String  // 선택했을 시간 - id용
 
-    lateinit var selected_bounds: LatLngBounds
+    var selected_Lat : Double = 0.0   // 선택한 좌표의 위도
+    var selected_Lng : Double = 0.0   // 선택한 좌표의 경도
+
+    // 현재 좌표를 위한 locationSource 선언
+    private lateinit var locationSource: FusedLocationSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -48,7 +58,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         val view = addTodoBinding.root
         setContentView(view)
 
-
+        // 현재 좌표값 불러오기
+        locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
 
         // MainActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_mainactivity = getIntent()
@@ -83,7 +94,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
-
+                // 목표 시간
                 goal_time = (hour.toString()+ minute.toString()).toInt()
                 addTodoBinding.TimeButton.text = SimpleDateFormat("HH:mm").format(cal.time)
             }
@@ -104,8 +115,9 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // MAP 버튼 클릭 시 위치 등록
         addTodoBinding.MapButton.setOnClickListener {
-            if ( selected_bounds != null) {
+            if ( selected_Lng != 0.0 && selected_Lat != 0.0) {
                 // 주소로 변경 - 네이버 reverse geocoding API 사용
+                Log.d(TAG,"좌표값 입력")
             }
             else {
                 Toast.makeText(this, "지도에서 목적지를 선택하여 주십시오", Toast.LENGTH_SHORT).show()
@@ -128,6 +140,11 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val circle = CircleOverlay()
 
+        // 현재 위치 지정
+        naverMap.locationSource = locationSource
+        selected_Lat = locationSource.lastLocation!!.latitude
+        selected_Lng = locationSource.lastLocation!!.longitude
+
         // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
         naverMap.setOnMapClickListener { pointF, coord ->
             // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
@@ -139,11 +156,33 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             circle.outlineColor = GREEN
             circle.color = 0
             circle.map = naverMap
-            // 선택된 좌표 기준 범위 설정
-            selected_bounds = circle.bounds
+            // 선택된 중심 좌표 값 저장
+            selected_Lat = coord.latitude
+            selected_Lng = coord.longitude
+
 
         }
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+
+            if (locationSource.onRequestPermissionsResult(requestCode,permissions,grantResults)) {
+                if (!locationSource.isActivated) {
+                    Toast.makeText(this,"권한을 허락해주십시오",Toast.LENGTH_LONG)
+                }
+                return
+            }
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+    }
+
 
     // 06.21 입력 받은 날짜를 기준으로 id 생성 후 입력 받은 값들 realm DB 등록해주기
 
@@ -159,8 +198,9 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
         // 목표 달성 시간 넣어주기
         newItem.time = goal_time.toLong()
-        // 지도에서 받아온 목표 범위위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가
-        newItem.where = selected_bounds
+        // 지도에서 받아온 목표 범위위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가 -> 중심 좌표를 등록하는것으로 정리
+        newItem.center_lat = selected_Lat
+        newItem.center_lng = selected_Lng
 
         Log.d(TAG,"ID : ${now_date + now_time}  // Todo : ${newItem.what}  // Time : ${newItem.time} ")
 

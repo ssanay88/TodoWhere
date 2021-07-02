@@ -11,5 +11,6 @@ open class Todo (
     @PrimaryKey var id: String = "" ,
     var what: String = "" ,
     var time: Long = 0 ,
-    var where: LatLngBounds ?= null
+    var center_lat: Double = 0.0,
+    var center_lng: Double = 0.0
 )  : RealmObject() {}

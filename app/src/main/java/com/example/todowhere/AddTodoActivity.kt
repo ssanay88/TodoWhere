@@ -142,8 +142,17 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 현재 위치 지정
         naverMap.locationSource = locationSource
-        selected_Lat = locationSource.lastLocation!!.latitude
-        selected_Lng = locationSource.lastLocation!!.longitude
+
+        // 마지막 위치를 반환이지만 아직 위치 수신 전이면 null을 반환
+        if (locationSource.lastLocation == null) {
+            selected_Lat = 37.5670135
+            selected_Lng = 126.9783740
+        } else {
+            selected_Lat = locationSource.lastLocation!!.latitude
+            selected_Lng = locationSource.lastLocation!!.longitude
+        }
+
+
 
         // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
         naverMap.setOnMapClickListener { pointF, coord ->

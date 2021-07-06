@@ -59,6 +59,8 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
 
     // 목록에서 보여줄 아이템 개수
     override fun getItemCount(): Int {
+        // 해당 요일 별로 realm에서 불러와서 카운트 + 1 -> 마지막은 일정 추가 버튼
+
         return 3
     }
 
@@ -82,6 +84,7 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
         }
 
         fun bind() {
+            // Realm 에서 데이터 불러와서 적용
 
         }
 

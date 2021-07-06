@@ -94,8 +94,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
-                // 목표 시간
-                goal_time = (hour.toString()+ minute.toString()).toInt()
+                // 목표 시간 , 초 단위로 진행
+                goal_time = (hour * 3600 + minute * 60)
                 addTodoBinding.TimeButton.text = SimpleDateFormat("HH:mm").format(cal.time)
             }
 

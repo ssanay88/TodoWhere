@@ -63,12 +63,23 @@ class MainActivity : AppCompatActivity() {
             selected_day = dayOfMonth
             selected_month = month + 1
             selected_year = year
-            selected_date =
-                selected_year.toString() + selected_month.toString() + selected_day.toString()
+
+            if (selected_month < 10) {
+                selected_date =
+                    selected_year.toString() + '0' + selected_month.toString() + selected_day.toString()
+
+            } else {
+                selected_date =
+                    selected_year.toString() + selected_month.toString() + selected_day.toString()
+            }
+
+
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
         }
 
+
+        myAdapter.itemCount
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
         myAdapter.setonBtnClickListener(object : MyAdapter.onBtnClickListener {

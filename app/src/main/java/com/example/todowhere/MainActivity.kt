@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val myAdapter = MyAdapter(this)
+        val myAdapter = MyAdapter(this,find_Item_Count(selected_date))
         mainBinding.TodoRecyclerView.adapter = myAdapter
 
         // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         mainBinding.TodoRecyclerView.layoutManager = layout
 
         // 어댑터에 넘겨줄 현재 날짜 (캘린더에서 날짜 미선택시)
-        myAdapter.Selected_date = selected_date
+        // myAdapter.Selected_date = selected_date
 
         selected_date = getDate(selected_year,selected_month,selected_day)
 
@@ -77,8 +77,8 @@ class MainActivity : AppCompatActivity() {
 
             selected_date = getDate(selected_year,selected_month,selected_day)
 
-            // 어댑터에 넘겨줄 선택된 날짜
-            myAdapter.Selected_date = selected_date
+//            // 어댑터에 넘겨줄 선택된 날짜
+//            myAdapter.Selected_date = selected_date
 
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
@@ -99,7 +99,6 @@ class MainActivity : AppCompatActivity() {
                     // 선택한 날짜 넘겨주기
                     Log.d(TAG,"선택한 날짜 : $selected_date")
                     Log.d(TAG,"선택한 시간 : $cur_time_form")
-                    Log.d(TAG,"데이터 수 : ${myAdapter.Selected_date}")
 
                     putExtra("DATE", selected_date)
                     putExtra("TIME", cur_time_form)

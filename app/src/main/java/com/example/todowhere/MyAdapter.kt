@@ -19,9 +19,9 @@ import io.realm.Realm
 import io.realm.kotlin.where
 import org.w3c.dom.Text
 
-class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
+class MyAdapter(private val context: Context, val Item : Int) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
 
-    lateinit var Selected_date : String
+    lateinit var Now_Item_Count : String
 
     val realm = Realm.getDefaultInstance()
 
@@ -36,7 +36,6 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder2 {
         // 연결할 레이아웃 설정
         val view = LayoutInflater.from(context).inflate(R.layout.add_todo, parent, false)
-        Log.d(TAG,"넘어온 날짜 는 $Selected_date")
         return MyViewHolder2(view)
 
 
@@ -69,7 +68,7 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
     override fun getItemCount(): Int {
         // 해당 요일 별로 realm에서 불러와서 카운트 + 1 -> 마지막은 일정 추가 버튼
 
-        return 1
+        return Item + 1
     }
 
 

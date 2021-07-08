@@ -113,18 +113,21 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             insertTodo()
         }
 
+        // 취소 버튼 클릭 시
+        addTodoBinding.CancelButton.setOnClickListener {
+            super.onBackPressed()
+        }
+
         // MAP 버튼 클릭 시 위치 등록
         addTodoBinding.MapButton.setOnClickListener {
             if ( selected_Lng != 0.0 && selected_Lat != 0.0) {
                 // 주소로 변경 - 네이버 reverse geocoding API 사용
-                Log.d(TAG,"좌표값 입력")
+                Log.d(TAG,"좌표값 입력 Lng : $selected_Lng , Lat : $selected_Lat")
             }
             else {
                 Toast.makeText(this, "지도에서 목적지를 선택하여 주십시오", Toast.LENGTH_SHORT).show()
             }
         }
-
-
     }
 
     override fun onDestroy() {

@@ -3,6 +3,7 @@ package com.example.todowhere
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.icu.util.Calendar
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,9 +16,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todowhere.databinding.AddTodoBinding
 import com.example.todowhere.databinding.TodoListBinding
 import io.realm.Realm
+import io.realm.kotlin.where
 import org.w3c.dom.Text
 
 class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
+
+    lateinit var Selected_date : String
+
+    val realm = Realm.getDefaultInstance()
+
 
     // xml을 여러개 사용하려고 할 때
 //    override fun getItemViewType(position: Int): Int {
@@ -29,6 +36,7 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder2 {
         // 연결할 레이아웃 설정
         val view = LayoutInflater.from(context).inflate(R.layout.add_todo, parent, false)
+        Log.d(TAG,"넘어온 날짜 는 $Selected_date")
         return MyViewHolder2(view)
 
 
@@ -61,15 +69,13 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
     override fun getItemCount(): Int {
         // 해당 요일 별로 realm에서 불러와서 카운트 + 1 -> 마지막은 일정 추가 버튼
 
-        return 3
+        return 1
     }
+
 
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
-        // Realm 인스턴스
-        val realm = Realm.getDefaultInstance()
 
 
         val TAG : String = "로그"
@@ -111,5 +117,7 @@ class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyAdapter.M
         }
 
     }
+
+
 
 }

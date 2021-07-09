@@ -19,9 +19,9 @@ import io.realm.Realm
 import io.realm.kotlin.where
 import org.w3c.dom.Text
 
-class MyAdapter(private val context: Context, val Item : Int) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
+// 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
+class MyAdapter(private val context: Context, var Item : Int) : RecyclerView.Adapter<MyAdapter.MyViewHolder2>() {
 
-    lateinit var Now_Item_Count : String
 
     val realm = Realm.getDefaultInstance()
 

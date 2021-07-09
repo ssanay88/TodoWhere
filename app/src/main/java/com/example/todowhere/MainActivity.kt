@@ -57,8 +57,6 @@ class MainActivity : AppCompatActivity() {
         val layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
-        // 어댑터에 넘겨줄 현재 날짜 (캘린더에서 날짜 미선택시)
-        // myAdapter.Selected_date = selected_date
 
         selected_date = getDate(selected_year,selected_month,selected_day)
 
@@ -75,10 +73,14 @@ class MainActivity : AppCompatActivity() {
             selected_year = year
             selected_day = dayOfMonth
 
+            // 선택한 날짜를 yyyyMMdd 형태로 변형
             selected_date = getDate(selected_year,selected_month,selected_day)
 
-//            // 어댑터에 넘겨줄 선택된 날짜
-//            myAdapter.Selected_date = selected_date
+            // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+            myAdapter.Item = find_Item_Count(selected_date)
+            // adapter에게 Data가 변했다는 것을 알려줍니다.
+            myAdapter.notifyDataSetChanged()
+
 
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
@@ -137,7 +139,7 @@ class MainActivity : AppCompatActivity() {
     fun find_Item_Count(date : String) : Int {
 
         val realmResult = realm.where<Todo>().contains("id",date).findAll()
-        Log.d(ContentValues.TAG," 지금 아이템 수 : ${realmResult.size}")
+        Log.d(TAG," 지금 아이템 수 : ${realmResult.size}")
         return realmResult.size
 
     }

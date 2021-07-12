@@ -12,6 +12,7 @@ import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
 import com.naver.maps.map.overlay.CircleOverlay
 import io.realm.Realm
+import io.realm.kotlin.createObject
 import io.realm.kotlin.where
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -46,19 +47,28 @@ class MainActivity : AppCompatActivity() {
         val mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 
+        Log.d(TAG,"MainActivity 시작")
+
+        selected_date = getDate(selected_year,selected_month,selected_day)
+        var realmResult = realm.where<Todo>().contains("id",selected_date).findAll()
+
+        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+        if (realmResult.size == 0 ) {
+            add_blank_data(selected_date)
+        }
+
 
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date))
+        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
         mainBinding.TodoRecyclerView.adapter = myAdapter
+
 
         // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
         val layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
-
-        selected_date = getDate(selected_year,selected_month,selected_day)
 
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
@@ -76,8 +86,16 @@ class MainActivity : AppCompatActivity() {
             // 선택한 날짜를 yyyyMMdd 형태로 변형
             selected_date = getDate(selected_year,selected_month,selected_day)
 
+            // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+            realmResult = realm.where<Todo>().contains("id",selected_date).findAll()
+            if (realmResult.size == 0 ) {
+                add_blank_data(selected_date)
+            }
+
+
             // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
             myAdapter.Item = find_Item_Count(selected_date)
+
             // adapter에게 Data가 변했다는 것을 알려줍니다.
             myAdapter.notifyDataSetChanged()
 
@@ -111,9 +129,6 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        // Realm 데이터 베이스
-        // val realm = Realm.getDefaultInstance()  // Realm 객체 초기화
-
 
     }
 
@@ -139,8 +154,26 @@ class MainActivity : AppCompatActivity() {
     fun find_Item_Count(date : String) : Int {
 
         val realmResult = realm.where<Todo>().contains("id",date).findAll()
+
         Log.d(TAG," 지금 아이템 수 : ${realmResult.size}")
         return realmResult.size
 
     }
+
+    // 일정 추가를 위한 빈 데이터 추가
+    fun add_blank_data(date : String) : Unit {
+        realm.beginTransaction()
+        // id를 선택한 날짜 + 999999 형태로 설정
+        val blank_item = realm.createObject<Todo>(date + "999999")
+        blank_item.what = "BLANK"
+        blank_item.time = 0
+        blank_item.view_type = 0
+        blank_item.center_lat = 0.0
+        blank_item.center_lng = 0.0
+
+        realm.commitTransaction()
+
+
+    }
+
 }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -26,11 +27,11 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     val realm = Realm.getDefaultInstance()
 
 
-
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
 
         return todo_datas[position].view_type
+
     }
 
     // 뷰홀더가 생성될때
@@ -90,16 +91,15 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
     inner class MyViewHolder_Update(view: View) : RecyclerView.ViewHolder(view) {
 
-
         val TAG : String = "로그"
 
         private val TodoTextView : TextView = view.findViewById(R.id.todoText)
-        private val TimerBtn : Button = view.findViewById(R.id.TimeButton)
-        private val MapBtn : Button = view.findViewById(R.id.map_button)
-        private val delBtn : Button = view.findViewById(R.id.delete_button)
+        private val TimerBtn : Button = view.findViewById(R.id.timer_button)
+        private val MapBtn : ImageButton = view.findViewById(R.id.map_button)
+        private val delBtn : ImageButton = view.findViewById(R.id.delete_button)
 
         init {
-            Log.d(TAG,"MyViewHolder called!!")
+            Log.d(TAG,"MyViewHolder_Update called!!")
         }
 
         fun bind(item:Todo) {
@@ -126,7 +126,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         val addBtn: Button = view.findViewById(R.id.todo_add_button)
 
         init {
-            Log.d(TAG, "MyViewHolder2 called!!")
+            Log.d(TAG, "MyViewHolder_Add called!!")
         }
 
         fun bind() {

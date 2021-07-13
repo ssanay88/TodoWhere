@@ -2,6 +2,7 @@ package com.example.todowhere
 
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color.GREEN
 import android.location.Location
 import android.location.LocationListener
@@ -111,6 +112,10 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 등록 버튼 클릭 시 해당 데이터 등록
         addTodoBinding.AddButton.setOnClickListener {
             insertTodo()
+            var next_intent = Intent(this, MainActivity::class.java).apply {
+            }
+            startActivity(next_intent)
+
         }
 
         // 취소 버튼 클릭 시

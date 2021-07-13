@@ -12,6 +12,7 @@ import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
 import com.naver.maps.map.overlay.CircleOverlay
 import io.realm.Realm
+import io.realm.Sort
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
 import java.text.DateFormat
@@ -50,7 +51,8 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG,"MainActivity 시작")
 
         selected_date = getDate(selected_year,selected_month,selected_day)
-        var realmResult = realm.where<Todo>().contains("id",selected_date).findAll()
+        var realmResult =
+            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
 
         // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
         if (realmResult.size == 0 ) {
@@ -87,10 +89,15 @@ class MainActivity : AppCompatActivity() {
             selected_date = getDate(selected_year,selected_month,selected_day)
 
             // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
-            realmResult = realm.where<Todo>().contains("id",selected_date).findAll()
+            realmResult =
+                realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+            Log.d(TAG,"$realmResult")
+
             if (realmResult.size == 0 ) {
                 add_blank_data(selected_date)
             }
+
+            myAdapter.todo_datas = realmResult
 
 
             // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
@@ -132,7 +139,38 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    // 날짜를 원하는 8자리로 만들어주는 함수수
+    // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가
+    override fun onResume() {
+        super.onResume()
+        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+
+        var realmResult =
+            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+
+        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+        if (realmResult.size == 0 ) {
+            add_blank_data(selected_date)
+        }
+
+        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        mainBinding.TodoRecyclerView.adapter = myAdapter
+
+
+        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
+        val layout = LinearLayoutManager(this)
+        mainBinding.TodoRecyclerView.layoutManager = layout
+        myAdapter.todo_datas = realmResult
+
+
+        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+        myAdapter.Item = find_Item_Count(selected_date)
+
+        // adapter에게 Data가 변했다는 것을 알려줍니다.
+        myAdapter.notifyDataSetChanged()
+
+    }
+
+    // 날짜를 원하는 8자리로 만들어주는 함수
    fun getDate(year : Int , month : Int , day : Int) : String {
 
         var date : String
@@ -166,10 +204,7 @@ class MainActivity : AppCompatActivity() {
         // id를 선택한 날짜 + 999999 형태로 설정
         val blank_item = realm.createObject<Todo>(date + "999999")
         blank_item.what = "BLANK"
-        blank_item.time = 0
-        blank_item.view_type = 0
-        blank_item.center_lat = 0.0
-        blank_item.center_lng = 0.0
+
 
         realm.commitTransaction()
 
@@ -177,3 +212,4 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
+

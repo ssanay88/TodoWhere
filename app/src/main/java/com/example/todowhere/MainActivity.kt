@@ -10,7 +10,6 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
-import com.naver.maps.map.overlay.CircleOverlay
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.createObject

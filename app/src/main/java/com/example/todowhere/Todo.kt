@@ -1,7 +1,5 @@
 package com.example.todowhere
 
-import com.naver.maps.geometry.LatLngBounds
-import com.naver.maps.map.overlay.CircleOverlay
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 

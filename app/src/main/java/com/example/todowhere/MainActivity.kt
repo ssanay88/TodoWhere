@@ -1,12 +1,17 @@
 package com.example.todowhere
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
@@ -14,6 +19,7 @@ import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
+import org.jetbrains.anko.toast
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
     var TAG: String = "로그"
+    val PERMISSIONS_REQUEST_CODE = 100
 
     // realm 사용을 위한 객체 선언
     val realm = Realm.getDefaultInstance()
@@ -48,6 +55,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(mainBinding.root)
 
         Log.d(TAG,"MainActivity 시작")
+
+        // 위치 권환 요청
+
 
         selected_date = getDate(selected_year,selected_month,selected_day)
         var realmResult =
@@ -207,6 +217,68 @@ class MainActivity : AppCompatActivity() {
 
         realm.commitTransaction()
 
+    }
+
+    // 권한 확인
+    fun UpdateLocation() {
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED){
+            // 권한이 거부했을 경우
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),PERMISSIONS_REQUEST_CODE)
+
+
+        } else {
+            // 권한이 허용된 경우
+        }
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            // 권환을 거부했을 경우
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),PERMISSIONS_REQUEST_CODE)
+
+        } else {
+            // 권한이 허용된 경우
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_CODE -> {
+                if (grantResults.isEmpty()) {
+                    throw RuntimeException("Empty permission result")
+                }
+
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 권한이 허용된 경우
+                } else {
+                    // 권한이 거부된 경우( Deny 버튼 )
+                    if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        Log.d(TAG,"사용자가 권한 거부")
+                        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),PERMISSIONS_REQUEST_CODE)
+                    } else {
+                        // 권한이 거부되고 다시 묻지 않음 ( Deny & Don't ask again)
+                        Log.d(TAG,"사용자가 권한 거부 및 다시 묻지 않기")
+                        // 세팅으로 가서 무조건 허용하도록 작성성
+                        GetPermission()
+                   }
+                }
+            }
+        }
+    }
+
+    // 무조건 권한을 받아오는 함수
+    private fun GetPermission() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("권한 필수 요청")
+            .setMessage("위치 서비스를 이용하기 위해 권한이 반드시 허용되어야 합니다.")
+
+        builder.setPositiveButton("OK") {
+
+        }
 
     }
 

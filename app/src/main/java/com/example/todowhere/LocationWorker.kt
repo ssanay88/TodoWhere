@@ -1,10 +1,12 @@
 package com.example.todowhere
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentProviderClient
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -16,13 +18,12 @@ import com.naver.maps.map.util.FusedLocationSource
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
+//
+@SuppressLint("MissingPermission")
 class LocationWorker(context: Context , workerparams:WorkerParameters) : Worker(context , workerparams)  {
 
     private val wContext = context
 
-    // 권한 확인에 대한 변수
-    private var Fine_Permission_Check = ContextCompat.checkSelfPermission(wContext, Manifest.permission.ACCESS_FINE_LOCATION)
-    private var Background_Permission_Check = ContextCompat.checkSelfPermission(wContext, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -40,12 +41,7 @@ class LocationWorker(context: Context , workerparams:WorkerParameters) : Worker(
         return Result.success()
     }
 
-    override fun UpdateLocation() {
-        if (Fine_Permission_Check == PackageManager.PERMISSION_DENIED || Background_Permission_Check == PackageManager.PERMISSION_DENIED){
-            // 둘 중 하나라도 권한이 거부된 경우
 
-        }
-    }
 
 
 }

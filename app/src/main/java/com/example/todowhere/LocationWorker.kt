@@ -6,6 +6,7 @@ import android.content.ContentProviderClient
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
@@ -22,6 +23,8 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 @SuppressLint("MissingPermission")
 class LocationWorker(context: Context , workerparams:WorkerParameters) : Worker(context , workerparams)  {
 
+    var TAG: String = "로그"
+
     private val wContext = context
 
 
@@ -36,8 +39,15 @@ class LocationWorker(context: Context , workerparams:WorkerParameters) : Worker(
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(wContext)
         // 권한을 우선 확인해야함
         fusedLocationClient.lastLocation.addOnSuccessListener { location : Location? ->
+            if (location != null) {
+                val latitude = location.latitude
+                val longitude = location.longitude
+                Log.d(TAG, "GPS Location Latitude: $latitude" + ", Longitude: $longitude")
+            }
 
         }
+
+        // 작업이 결과에서 성공적으로 완료되었는지 여부를 나타냅니다.작업이 결과에서 성공적으로 완료되었는지 여부를 나타냅니다.
         return Result.success()
     }
 

@@ -19,6 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/Todo_RecyclerView"
         android:layout_width="0dp"
@@ -27,10 +28,26 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        tools:listitem="@layout/add_todo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CalendarView" />
+        app:layout_constraintTop_toBottomOf="@+id/CalendarView"
+        tools:listitem="@layout/add_todo" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/Todo_RecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/Todo_RecyclerView"
+        app:layout_constraintHorizontal_bias="0.049"
+        app:layout_constraintStart_toStartOf="@+id/Todo_RecyclerView"
+        app:layout_constraintTop_toTopOf="@+id/Todo_RecyclerView"
+        app:layout_constraintVertical_bias="0.951"
+        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

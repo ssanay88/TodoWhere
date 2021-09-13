@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
 import io.realm.Realm
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
     var TAG: String = "로그"
-    val FINE_LOTATION_REQUEST_CODE = 100
+    val FINE_LOCATION_REQUEST_CODE = 100
     val FINE_BACKGROUND_REQUEST_CODE = 200
 
     // realm 사용을 위한 객체 선언
@@ -62,7 +63,8 @@ class MainActivity : AppCompatActivity() {
         // 권한을 확인하는 함수
 
         // 위치 권환 요청
-        UpdateLocation()
+        CheckPermission()
+
 
 
         selected_date = getDate(selected_year,selected_month,selected_day)
@@ -226,12 +228,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 권한 확인
-    fun UpdateLocation() {
+    fun CheckPermission() {
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED){
             // 권한이 거부했을 경우
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),FINE_LOTATION_REQUEST_CODE)
-
+            Log.d(TAG,"FINE_LOCATION 접근 권한 불허")
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),FINE_LOCATION_REQUEST_CODE)
+            // 위의 권한 요청에 따른 결과들은 onRequestPermissionsResult 함수로 출력
 
         } else {
             // 권한이 허용된 경우
@@ -240,7 +243,9 @@ class MainActivity : AppCompatActivity() {
 
         if (checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED) {
             // 권환을 거부했을 경우
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),FINE_LOTATION_REQUEST_CODE)
+            Log.d(TAG,"BACKGROUND_LOCATION 접근 권한 불허")
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),FINE_BACKGROUND_REQUEST_CODE)
+            // 위의 권한 요청에 따른 결과들은 onRequestPermissionsResult 함수로 출력
 
         } else {
             // 권한이 허용된 경우
@@ -255,7 +260,7 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         when (requestCode) {
-            FINE_LOTATION_REQUEST_CODE -> {
+            FINE_LOCATION_REQUEST_CODE -> {
 //                if (grantResults.isEmpty()) {
 //                    Log.d(TAG,"권한 결과가 비었음")
 //                    // throw RuntimeException("Empty permission result")
@@ -263,17 +268,17 @@ class MainActivity : AppCompatActivity() {
 
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 권한이 허용된 경우
-                    Log.d(TAG,"권한 허용")
+                    Log.d(TAG,"FINE_LOCATION 권한 허용")
                 } else {
-                    // 권한이 거부된 경우( Deny 버튼 )
+                    // 권한이 명시적으로 거부된 경우( Deny 버튼 )
                     if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
                         Log.d(TAG,"사용자가 권한 거부")
-                        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),FINE_LOTATION_REQUEST_CODE)
+                        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),FINE_LOCATION_REQUEST_CODE)
                     } else {
-                        // 권한이 거부되고 다시 묻지 않음 ( Deny & Don't ask again)
-                        Log.d(TAG,"사용자가 권한 거부 및 다시 묻지 않기")
+                        // 권한을 처음 보거나 다시 묻지 않음을 선택하거나 권한을 허용한 경우 false 리턴
+                        Log.d(TAG,"사용자가 권한 허용")
                         // 세팅으로 가서 무조건 허용하도록 작성성
-                        GetPermission()
+
                    }
                 }
             }
@@ -286,16 +291,17 @@ class MainActivity : AppCompatActivity() {
 
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 권한이 허용된 경우
+                    Log.d(TAG,"BACKGROUND 권한 허용")
                 } else {
                     // 권한이 거부된 경우( Deny 버튼 )
                     if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                         Log.d(TAG,"사용자가 권한 거부")
-                        requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),FINE_BACKGROUND_REQUEST_CODE)
-                    } else {
-                        // 권한이 거부되고 다시 묻지 않음 ( Deny & Don't ask again)
-                        Log.d(TAG,"사용자가 권한 거부 및 다시 묻지 않기")
-                        // 세팅으로 가서 무조건 허용하도록 작성성
+                        // requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),FINE_BACKGROUND_REQUEST_CODE)
                         GetPermission()
+                    } else {
+                        // 권한을 처음 보거나 다시 묻지 않음을 선택하거나 권한을 허용한 경우 false 리턴
+                        Log.d(TAG,"사용자가 권한 허용")
+                        // 세팅으로 가서 무조건 허용하도록 작성성
                     }
                 }
             }

@@ -1,6 +1,8 @@
 package com.example.todowhere
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +13,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,6 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationServices
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.createObject
@@ -51,6 +58,24 @@ class MainActivity : AppCompatActivity() {
     var cur_time = Date().time
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
 
+    // Location API를 사용하기 위한 geofencing client 인스턴스 생성
+    private val geofencingClient : GeofencingClient by lazy {
+        LocationServices.getGeofencingClient(this)
+    }
+
+    // BroadcastReceiver를 시작하는 PendingIntent 정의
+    private val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    // Geofencing을 저장할 리스트
+    public val geofenceList : MutableList<Geofence> = mutableListOf()
+
+
+
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,8 +89,6 @@ class MainActivity : AppCompatActivity() {
 
         // 위치 권환 요청
         CheckPermission()
-
-
 
         selected_date = getDate(selected_year,selected_month,selected_day)
         var realmResult =
@@ -146,6 +169,7 @@ class MainActivity : AppCompatActivity() {
 
                     putExtra("DATE", selected_date)
                     putExtra("TIME", cur_time_form)
+                    putExtra("GeofenceList",geofenceList)
 
                 }
                 startActivity(next_intent)
@@ -327,6 +351,42 @@ class MainActivity : AppCompatActivity() {
         val dialog = builder.create()
         dialog.show()
 
+    }
+
+    // 지오펜스 객체를 생성하는 함수
+    private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long):Geofence {
+        return Geofence.Builder()
+            .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
+            .setCircularRegion(geo.first,geo.second,radius)    // 위치 및 반경(m)
+            .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
+            .setLoiteringDelay(10000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds
+            .setTransitionTypes(
+                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT or Geofence.GEOFENCE_TRANSITION_DWELL)
+            .build()
+    }
+
+    // Geofence 지정 및 관련 이벤트 트리거 방식을 설정하기 위해 GeofencingRequest 빌드
+    // INITIAL_TRIGGER_ENTER를 지정하면 기기가 이미 지오펜싱 내부에 있는 경우 GEOFENCE_TRANSITION_ENTER를
+    // 트리거해야 한다고 위치 서비스에 알림
+    private fun getGeofencingRequest(list:List<Geofence>):GeofencingRequest {
+        return GeofencingRequest.Builder().apply {
+            // Geofence 이벤트는 진입시부터 처리할 때
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            addGeofences(list)  // Geofence 리스트 추가
+        }.build()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun addGeofences() {
+        CheckPermission()
+        geofencingClient.addGeofences(getGeofencingRequest(geofenceList),geofencePendingIntent).run {
+            addOnSuccessListener {
+                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
+            }
+            addOnFailureListener {
+                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
 }

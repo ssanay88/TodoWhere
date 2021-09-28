@@ -62,7 +62,7 @@ dependencies {
     // 멀티덱스용 설정
     implementation ("androidx.multidex:multidex:2.0.1")
     // 위치 추적 기능을 위한 의존성 추가
-    implementation "com.google.android.gms:play-services-location:16.0.0"
+    implementation "com.google.android.gms:play-services-location:18.0.0"
     // WorkManager를 위한 의존성 추가
     implementation("androidx.work:work-runtime-ktx:$work_version")
 

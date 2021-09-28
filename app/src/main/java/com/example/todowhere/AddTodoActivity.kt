@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import com.example.todowhere.databinding.ActivityAddTodoBinding
+import com.google.android.gms.location.Geofence
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.LocationTrackingMode
@@ -221,10 +222,24 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 리사이클뷰에서 보여줄 뷰홀더 변경
         newItem.view_type = 1
 
+
+
         Log.d(TAG,"ID : ${now_date + now_time}  // Todo : ${newItem.what}  // Time : ${newItem.time} ")
 
         realm.commitTransaction()   // 트랜잭션 종료 반영
 
+    }
+
+    // 지오펜스 객체를 생성하는 함수
+    private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long): Geofence {
+        return Geofence.Builder()
+            .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
+            .setCircularRegion(geo.first,geo.second,radius)    // 위치 및 반경(m)
+            .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
+            .setLoiteringDelay(10000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds
+            .setTransitionTypes(
+                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT or Geofence.GEOFENCE_TRANSITION_DWELL)
+            .build()
     }
 
 

@@ -52,11 +52,14 @@ class MainActivity : AppCompatActivity() {
     var selected_date: String =
         selected_year.toString() + selected_month.toString() + selected_day.toString()
 
-
-
     // real DB에서 사용할 id를 위한 현재 시간 변수
     var cur_time = Date().time
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
+
+    // Geofencing 객체를 만들기 위해 AddTodoActivity에서 불러온 좌표값 , 목표 달성 시간
+    var saved_Lat : Double = 0.0
+    var saved_Lng : Double = 0.0
+    var saved_time : Int = 0
 
     // Location API를 사용하기 위한 geofencing client 인스턴스 생성
     private val geofencingClient : GeofencingClient by lazy {
@@ -89,6 +92,13 @@ class MainActivity : AppCompatActivity() {
 
         // 위치 권환 요청
         CheckPermission()
+
+        // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
+        var intent_from_addtodoactivity = getIntent()
+
+        // AddTodoActivity 에서 선택한 좌표값들 선언언
+        var saved_Lat = intent_from_addtodoactivity.getDoubleExtra("Lat",0.0)
+        var saved_Lng = intent_from_addtodoactivity.getDoubleExtra("Lng",0.0)
 
         selected_date = getDate(selected_year,selected_month,selected_day)
         var realmResult =
@@ -169,7 +179,7 @@ class MainActivity : AppCompatActivity() {
 
                     putExtra("DATE", selected_date)
                     putExtra("TIME", cur_time_form)
-                    putExtra("GeofenceList",geofenceList)
+
 
                 }
                 startActivity(next_intent)
@@ -180,7 +190,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가
+    // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
     override fun onResume() {
         super.onResume()
         val mainBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -208,6 +218,11 @@ class MainActivity : AppCompatActivity() {
 
         // adapter에게 Data가 변했다는 것을 알려줍니다.
         myAdapter.notifyDataSetChanged()
+
+        /////// Geofencing 추가 코드 //////
+        // geofenceList에 새로 입력받은 값 추가
+        geofenceList.add(getGeofence(selected_date,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+        addGeofences()    // geofencing 추가
 
     }
 

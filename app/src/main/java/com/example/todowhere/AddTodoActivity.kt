@@ -66,6 +66,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // MainActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_mainactivity = getIntent()
 
+
+
         // 전달 받은 날짜와 시간 저장
         now_date = intent_from_mainactivity.getStringExtra("DATE")!!
         now_time = intent_from_mainactivity.getStringExtra("TIME")!!
@@ -114,6 +116,10 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         addTodoBinding.AddButton.setOnClickListener {
             insertTodo()
             var next_intent = Intent(this, MainActivity::class.java).apply {
+                // 좌표의 위도, 경도 전송
+                putExtra("Lat",selected_Lat)
+                putExtra("Lng",selected_Lng)
+                putExtra("Time",goal_time)
             }
             startActivity(next_intent)
 
@@ -169,7 +175,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             marker.position = LatLng( coord.latitude , coord.longitude )
             marker.map = naverMap
             circle.center = LatLng( coord.latitude , coord.longitude )
-            circle.radius = 20.0
+            circle.radius = 50.0    // 원 반경 50m
             circle.outlineWidth = 10
             circle.outlineColor = GREEN
             circle.color = 0

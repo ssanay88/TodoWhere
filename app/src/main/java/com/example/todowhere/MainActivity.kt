@@ -76,6 +76,9 @@ class MainActivity : AppCompatActivity() {
     public val geofenceList : MutableList<Geofence> = mutableListOf()
 
 
+    // Floating Button을 통한 진행 상태 판단하기 위한 변수
+    // Start = 일정 실행을 측정하고 있는 상태 , Stop = 일정 실행 측정 종료 상태
+    private var app_state = "Stop"
 
 
 
@@ -185,6 +188,18 @@ class MainActivity : AppCompatActivity() {
                 startActivity(next_intent)
             }
         })
+
+        mainBinding.StartStopBtn.setOnClickListener {
+            if (app_state == "Start") {
+                mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                app_state = "Stop"
+            }
+            else {
+                mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_stop_24)
+                app_state = "Start"
+            }
+
+        }
 
 
 

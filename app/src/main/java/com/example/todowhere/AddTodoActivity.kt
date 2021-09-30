@@ -26,6 +26,7 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
+import org.jetbrains.anko.toast
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -210,8 +211,26 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // 06.21 입력 받은 날짜를 기준으로 id 생성 후 입력 받은 값들 realm DB 등록해주기
 
+    // 입력 값들이 올바르게 들어가 있는지 확인
+    private fun checkData() {
+        // 할 일 텍스트 체크
+        if (addTodoBinding.whatTodoText.text.toString().isBlank()) {
+            Toast.makeText(this,"해야하는 일을 입력하여 주세요",Toast.LENGTH_LONG).show()
+
+        }
+        // 목표 시간 체크
+        if (goal_time == 0) {
+            Toast.makeText(this,"목표 시간을 입력하여 주세요",Toast.LENGTH_LONG).show()
+
+        }
+
+
+
+    }
     // Realm DB에 데이터 추가
     private fun insertTodo() {
+
+        checkData()     // 데이터들이 올바르게 입력됐는지 확인
 
         realm.beginTransaction()    // 트랜잭션 시작
 

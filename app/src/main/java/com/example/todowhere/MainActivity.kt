@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     // BroadcastReceiver를 시작하는 PendingIntent 정의
     private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(this, GeofenceBroadcastReceiver(app_state)::class.java)
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 

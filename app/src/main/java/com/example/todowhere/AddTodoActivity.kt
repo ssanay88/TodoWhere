@@ -41,7 +41,6 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
 
     val realm = Realm.getDefaultInstance()  // 인스턴스 얻기
-    // val calendar : Calendar = Calendar.getInstance()    // 캘린더 인스턴스 얻기
 
     var goal_time = 0       // 목표 시간
 
@@ -212,16 +211,20 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     // 06.21 입력 받은 날짜를 기준으로 id 생성 후 입력 받은 값들 realm DB 등록해주기
 
     // 입력 값들이 올바르게 들어가 있는지 확인
-    private fun checkData() {
+    private fun checkPlan() : Boolean {
         // 할 일 텍스트 체크
         if (addTodoBinding.whatTodoText.text.toString().isBlank()) {
             Toast.makeText(this,"해야하는 일을 입력하여 주세요",Toast.LENGTH_LONG).show()
-
+            return false
         }
         // 목표 시간 체크
-        if (goal_time == 0) {
+        else if (goal_time == 0) {
             Toast.makeText(this,"목표 시간을 입력하여 주세요",Toast.LENGTH_LONG).show()
+            return false
+        }
 
+        else {
+            return true
         }
 
 
@@ -230,28 +233,35 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     // Realm DB에 데이터 추가
     private fun insertTodo() {
 
-        checkData()     // 데이터들이 올바르게 입력됐는지 확인
+        if (checkPlan() == false) {
+            // 다시 계획이 올바르게 들어갔는지 확인
+        }
+        else
+        {
+            realm.beginTransaction()    // 트랜잭션 시작
 
-        realm.beginTransaction()    // 트랜잭션 시작
-
-        // 객체 생성
-        // id는 캘린더에서 선택한 날짜와 당시 시간으로 설정
-        val newItem = realm.createObject<Todo>(now_date + now_time)
-        // 무엇을 할지 설정
-        newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
-        // 목표 달성 시간 넣어주기
-        newItem.time = goal_time.toLong()
-        // 지도에서 받아온 목표 범위위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가 -> 중심 좌표를 등록하는것으로 정리
-        newItem.center_lat = selected_Lat
-        newItem.center_lng = selected_Lng
-        // 리사이클뷰에서 보여줄 뷰홀더 변경
-        newItem.view_type = 1
+            // 객체 생성
+            // id는 캘린더에서 선택한 날짜와 당시 시간으로 설정
+            val newItem = realm.createObject<Todo>(now_date + now_time)
+            // 무엇을 할지 설정
+            newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
+            // 목표 달성 시간 넣어주기
+            newItem.time = goal_time.toLong()
+            // 지도에서 받아온 목표 범위위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가 -> 중심 좌표를 등록하는것으로 정리
+            newItem.center_lat = selected_Lat
+            newItem.center_lng = selected_Lng
+            // 리사이클뷰에서 보여줄 뷰홀더 변경
+            newItem.view_type = 1
 
 
 
-        Log.d(TAG,"ID : ${now_date + now_time}  // Todo : ${newItem.what}  // Time : ${newItem.time} ")
+            Log.d(
+                TAG,
+                "ID : ${now_date + now_time}  // Todo : ${newItem.what}  // Time : ${newItem.time} "
+            )
 
-        realm.commitTransaction()   // 트랜잭션 종료 반영
+            realm.commitTransaction()   // 트랜잭션 종료 반영
+        }
 
     }
 

@@ -3,6 +3,7 @@ package com.example.todowhere
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.CountDownTimer
 import android.util.Log
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
@@ -11,7 +12,7 @@ import io.realm.Realm
 import java.util.*
 
 //
-class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
+class GeofenceBroadcastReceiver(var appState:String,var todayTodo: MutableList<Todo>) : BroadcastReceiver() {
 
     var TAG: String = "로그"
 
@@ -19,6 +20,9 @@ class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
     var today_date = getDate(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)+1,calendar.get(Calendar.DAY_OF_MONTH))    // 오늘 날짜 8자리로 표현
 
     val realm = Realm.getDefaultInstance()    // realm 기본 인스턴스 얻기기
+
+
+    private val geofenceCountDownTimer:CountDownTimer = object : CountDownTimer()    // 목표 시간동안 카운트 다운을 진행할 변수
 
    override fun onReceive(context: Context?, intent: Intent?) {
 

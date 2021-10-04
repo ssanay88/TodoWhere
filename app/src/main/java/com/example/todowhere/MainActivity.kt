@@ -51,10 +51,14 @@ class MainActivity : AppCompatActivity() {
     var selected_day = calendar.get(Calendar.DAY_OF_MONTH)
     var selected_date: String =
         selected_year.toString() + selected_month.toString() + selected_day.toString()
+    var today_date = getDate(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)+1,calendar.get(Calendar.DAY_OF_MONTH))    // 오늘 날짜 8자리로 표현
 
     // real DB에서 사용할 id를 위한 현재 시간 변수
     var cur_time = Date().time
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
+
+    // 오늘 날짜에 해당하는 일정들을 담는 리스트
+    var today_Todo : MutableList<Todo> = getTodayTodo(today_date)
 
     // Geofencing 객체를 만들기 위해 AddTodoActivity에서 불러온 좌표값 , 목표 달성 시간
     var saved_Lat : Double = 0.0
@@ -68,7 +72,7 @@ class MainActivity : AppCompatActivity() {
 
     // BroadcastReceiver를 시작하는 PendingIntent 정의
     private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver(app_state)::class.java)
+        val intent = Intent(this, GeofenceBroadcastReceiver(app_state,today_Todo)::class.java)
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -200,9 +204,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
-
-
     }
 
     // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
@@ -417,6 +418,31 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun getTodayTodo(Today_Date:String):MutableList<Todo> {
+
+        realm.beginTransaction()    // realm 트랜잭션 시작
+
+        val realmResult = realm.where(Todo::class.java).contains("id",Today_Date).findAll()
+        return realmResult.subList(0,realmResult.size)
+
+        // slice 와 subList의 차이점
+        // 둘 다 시작인덱스와 목표 인덱스를 지정하여 원하는 부분을 가져온다
+        // slice는 원본 리스트의 값들을 복사해서 들고 온다, subList는 원본 리스트를 참고하여 가져오기 때문에 원본 리스트에서
+        // 원소의 변화가 있을 경우 slice는 변화에 대응하지 않고 이전에 복사한 값 그대로이고 subList는 변경된 인덱스를 그대로 참조합니다.
+        /*
+            fun main() {
+        val myList = mutableListOf(1, 2, 3, 4)
+        val subList = myList.subList(1, 3)
+        val sliceList = myList.slice(1..2)
+        println(subList) // [2, 3]
+        println(sliceList) // [2, 3]
+        myList[1] = 5
+        println(subList) // [5, 3]
+        println(sliceList) // [2, 3]
+        }
+         */
     }
 
 }

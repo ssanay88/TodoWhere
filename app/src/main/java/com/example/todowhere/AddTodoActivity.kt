@@ -266,16 +266,16 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 지오펜스 객체를 생성하는 함수
-    private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long): Geofence {
-        return Geofence.Builder()
-            .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
-            .setCircularRegion(geo.first,geo.second,radius)    // 위치 및 반경(m)
-            .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
-            .setLoiteringDelay(10000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds
-            .setTransitionTypes(
-                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT or Geofence.GEOFENCE_TRANSITION_DWELL)
-            .build()
-    }
+//    private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long): Geofence {
+//        return Geofence.Builder()
+//            .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
+//            .setCircularRegion(geo.first,geo.second,radius)    // 위치 및 반경(m)
+//            .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
+//            .setLoiteringDelay(10000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds
+//            .setTransitionTypes(
+//                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT or Geofence.GEOFENCE_TRANSITION_DWELL)
+//            .build()
+//    }
 
 
 }

@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity() {
         var intent_from_addtodoactivity = getIntent()
 
         // AddTodoActivity 에서 선택한 좌표값들 선언언
-        var saved_Lat = intent_from_addtodoactivity.getDoubleExtra("Lat",0.0)
-        var saved_Lng = intent_from_addtodoactivity.getDoubleExtra("Lng",0.0)
+        saved_Lat = intent_from_addtodoactivity.getDoubleExtra("Lat",0.0)
+        saved_Lng = intent_from_addtodoactivity.getDoubleExtra("Lng",0.0)
 
         selected_date = getDate(selected_year,selected_month,selected_day)
         var realmResult =
@@ -237,7 +237,8 @@ class MainActivity : AppCompatActivity() {
 
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
-        geofenceList.add(getGeofence(selected_date,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+        // ID는 realm DB에 들어가는 id와 동일하게 적용
+        geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
         addGeofences()    // geofencing 추가
 
     }

@@ -107,9 +107,16 @@ class MainActivity : AppCompatActivity() {
         saved_Lat = intent_from_addtodoactivity.getDoubleExtra("Lat",0.0)
         saved_Lng = intent_from_addtodoactivity.getDoubleExtra("Lng",0.0)
 
+
         selected_date = getDate(selected_year,selected_month,selected_day)
+
+
+        // 문제 발생
+        Log.d(TAG,"!! 문제 발생 문제 발생 !!")
+
         var realmResult =
             realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+
 
         // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
         if (realmResult.size == 0 ) {

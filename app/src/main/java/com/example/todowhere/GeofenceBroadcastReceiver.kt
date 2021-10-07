@@ -16,7 +16,7 @@ import java.util.*
 import kotlin.concurrent.timer
 
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
-class GeofenceBroadcastReceiver(var appState:String, var todayTodo: MutableList<Todo>) : BroadcastReceiver() {
+class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
 
     var TAG: String = "로그"
 

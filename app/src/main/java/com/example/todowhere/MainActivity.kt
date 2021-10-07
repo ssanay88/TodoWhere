@@ -36,6 +36,8 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var mainBinding: ActivityMainBinding
+
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
     var TAG: String = "로그"
@@ -58,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
 
     // 오늘 날짜에 해당하는 일정들을 담는 리스트
-    var today_Todo : MutableList<Todo> = getTodayTodo(today_date)
+    // var today_Todo : MutableList<Todo> = getTodayTodo(today_date)
 
     // Geofencing 객체를 만들기 위해 AddTodoActivity에서 불러온 좌표값 , 목표 달성 시간
     var saved_Lat : Double = 0.0
@@ -72,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
     // BroadcastReceiver를 시작하는 PendingIntent 정의
     private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver(app_state,today_Todo)::class.java)
+        val intent = Intent(this, GeofenceBroadcastReceiver(app_state)::class.java)
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -85,12 +87,9 @@ class MainActivity : AppCompatActivity() {
     private var app_state = "Stop"
 
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+        mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 
         Log.d(TAG,"MainActivity 시작")
@@ -110,9 +109,6 @@ class MainActivity : AppCompatActivity() {
 
         selected_date = getDate(selected_year,selected_month,selected_day)
 
-
-        // 문제 발생
-        Log.d(TAG,"!! 문제 발생 문제 발생 !!")
 
         var realmResult =
             realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
@@ -250,6 +246,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+
     // 날짜를 원하는 8자리로 만들어주는 함수
    fun getDate(year : Int , month : Int , day : Int) : String {
 
@@ -284,7 +282,6 @@ class MainActivity : AppCompatActivity() {
         // id를 선택한 날짜 + 999999 형태로 설정
         val blank_item = realm.createObject<Todo>(date + "999999")
         blank_item.what = "BLANK"
-
 
         realm.commitTransaction()
 
@@ -428,30 +425,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTodayTodo(Today_Date:String):MutableList<Todo> {
-
-        realm.beginTransaction()    // realm 트랜잭션 시작
-
-        val realmResult = realm.where(Todo::class.java).contains("id",Today_Date).findAll()
-        return realmResult.subList(0,realmResult.size)
-
-        // slice 와 subList의 차이점
-        // 둘 다 시작인덱스와 목표 인덱스를 지정하여 원하는 부분을 가져온다
-        // slice는 원본 리스트의 값들을 복사해서 들고 온다, subList는 원본 리스트를 참고하여 가져오기 때문에 원본 리스트에서
-        // 원소의 변화가 있을 경우 slice는 변화에 대응하지 않고 이전에 복사한 값 그대로이고 subList는 변경된 인덱스를 그대로 참조합니다.
-        /*
-            fun main() {
-        val myList = mutableListOf(1, 2, 3, 4)
-        val subList = myList.subList(1, 3)
-        val sliceList = myList.slice(1..2)
-        println(subList) // [2, 3]
-        println(sliceList) // [2, 3]
-        myList[1] = 5
-        println(subList) // [5, 3]
-        println(sliceList) // [2, 3]
-        }
-         */
-    }
+//    private fun getTodayTodo(Today_Date:String):MutableList<Todo> {
+//
+//        realm.beginTransaction()    // realm 트랜잭션 시작
+//
+//        val realmResult = realm.where(Todo::class.java).contains("id",Today_Date).findAll()
+//        return realmResult.subList(0,realmResult.size)
+//
+//        // slice 와 subList의 차이점
+//        // 둘 다 시작인덱스와 목표 인덱스를 지정하여 원하는 부분을 가져온다
+//        // slice는 원본 리스트의 값들을 복사해서 들고 온다, subList는 원본 리스트를 참고하여 가져오기 때문에 원본 리스트에서
+//        // 원소의 변화가 있을 경우 slice는 변화에 대응하지 않고 이전에 복사한 값 그대로이고 subList는 변경된 인덱스를 그대로 참조합니다.
+//        /*
+//            fun main() {
+//        val myList = mutableListOf(1, 2, 3, 4)
+//        val subList = myList.subList(1, 3)
+//        val sliceList = myList.slice(1..2)
+//        println(subList) // [2, 3]
+//        println(sliceList) // [2, 3]
+//        myList[1] = 5
+//        println(subList) // [5, 3]
+//        println(sliceList) // [2, 3]
+//        }
+//         */
+//    }
 
 }
 

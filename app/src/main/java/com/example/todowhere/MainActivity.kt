@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.example.todowhere.databinding.ActivityMainBinding
@@ -33,6 +34,7 @@ import org.jetbrains.anko.toast
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -94,10 +96,11 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG,"MainActivity 시작")
 
-        // 권한을 확인하는 함수
-
         // 위치 권환 요청
         CheckPermission()
+
+        // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
+        resetworkManager()
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_addtodoactivity = getIntent()
@@ -424,6 +427,34 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // 매일 상태를 리셋할 함수
+    private fun resetworkManager() {
+        val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
+                .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)    // 초기 지연 설정
+            .addTag("Reset")
+            .build()
+
+
+        WorkManager.getInstance(this).enqueue(dailyResetRequeset)
+    }
+
+    // 실행 지연 시간을 설정하는 함수
+    fun getTimeUsingInWorkRequest() : Long {
+        val currentDate = Calendar.getInstance()
+        val dueDate = Calendar.getInstance()
+
+        dueDate.set(Calendar.HOUR_OF_DAY, 3)
+        dueDate.set(Calendar.MINUTE, 0)
+        dueDate.set(Calendar.SECOND, 0)
+
+        if(dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24)
+        }
+
+        return dueDate.timeInMillis - currentDate.timeInMillis
+    }
+
 
 //    private fun getTodayTodo(Today_Date:String):MutableList<Todo> {
 //

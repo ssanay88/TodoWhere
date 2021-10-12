@@ -5,10 +5,14 @@ import android.annotation.SuppressLint
 import android.content.ContentProviderClient
 import android.content.Context
 import android.content.pm.PackageManager
+import android.icu.util.Calendar
+import android.icu.util.TimeUnit
 import android.location.Location
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -19,35 +23,37 @@ import com.naver.maps.map.util.FusedLocationSource
 
 private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
-//
+//  https://zladnrms.tistory.com/157   Coroutineworker로 다시 만들어야 함
 @SuppressLint("MissingPermission")
-class LocationWorker(context: Context , workerparams:WorkerParameters) : Worker(context , workerparams)  {
+class ResetWorker(context: Context , workerparams:WorkerParameters) : Worker(context , workerparams)  {
 
     var TAG: String = "로그"
 
     private val wContext = context
 
-
-
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var now_location : Location ? = null
-
     // WorkManager에서 제공하는 백그라운드 스레드에서 비동기적으로 실행
     // doWork에서 반환되는 Result는 작업이 성공적인지 아닌지 판단 , 실패일 경우 WorkManager에 작업을 재실행해야하는지 알려줌
     override fun doWork(): Result {
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(wContext)
-        // 권한을 우선 확인해야함
-        fusedLocationClient.lastLocation.addOnSuccessListener { location : Location? ->
-            if (location != null) {
-                val latitude = location.latitude
-                val longitude = location.longitude
-                Log.d(TAG, "GPS Location Latitude: $latitude" + ", Longitude: $longitude")
-            }
-
+        val currentDate = Calendar.getInstance()
+        val dueDate = Calendar.getInstance()
+        // Set Execution around 03:00:00 AM
+        dueDate.set(Calendar.HOUR_OF_DAY, 3)
+        dueDate.set(Calendar.MINUTE, 0)
+        dueDate.set(Calendar.SECOND, 0)
+        if (dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24)
         }
+        val timeDiff = dueDate.timeInMillis - currentDate.timeInMillis
+        val dailyWorkRequest = OneTimeWorkRequestBuilder<ResetWorker>()
+            .setInitialDelay(timeDiff, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .addTag("TAG_OUTPUT")
+            .build()
 
-        // 작업이 결과에서 성공적으로 완료되었는지 여부를 나타냅니다.작업이 결과에서 성공적으로 완료되었는지 여부를 나타냅니다.
+        // 매일 반복하기 위해 리퀘스트를 다시 요청청
+       WorkManager.getInstance(applicationContext)
+            .enqueue(dailyWorkRequest)
+
         return Result.success()
     }
 

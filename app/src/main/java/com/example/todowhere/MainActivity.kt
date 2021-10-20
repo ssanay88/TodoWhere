@@ -329,7 +329,7 @@ class MainActivity : AppCompatActivity() {
 //                    // throw RuntimeException("Empty permission result")
 //                }
 
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.size != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 권한이 허용된 경우
                     Log.d(TAG,"FINE_LOCATION 권한 허용")
                 } else {
@@ -352,7 +352,7 @@ class MainActivity : AppCompatActivity() {
 //                    throw RuntimeException("Empty permission result")
 //                }
 
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.size != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 권한이 허용된 경우
                     Log.d(TAG,"BACKGROUND 권한 허용")
                 } else {
@@ -420,10 +420,10 @@ class MainActivity : AppCompatActivity() {
         CheckPermission()
         geofencingClient.addGeofences(getGeofencingRequest(geofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
-                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
             }
             addOnFailureListener {
-                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
             }
         }
     }

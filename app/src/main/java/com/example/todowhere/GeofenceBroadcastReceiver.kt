@@ -103,7 +103,10 @@ class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
 
         }    // appState가 Start일 경우에만 진행
 
+        timerTask?.cancel()    // appState가 Stop일 경우 타이머 종료
+
     }
+
 
     // 날짜를 원하는 8자리로 만들어주는 함수
     private fun getDate(year: Int, month: Int, day: Int): String {

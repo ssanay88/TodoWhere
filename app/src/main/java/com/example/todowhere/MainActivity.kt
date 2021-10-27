@@ -178,10 +178,10 @@ class MainActivity : AppCompatActivity() {
 
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
-        myAdapter.setonBtnClickListener(object : MyAdapter.onBtnClickListener {
+        myAdapter.setonBtnClickListener(object : MyAdapter.onAddBtnClickListener {
 
             // onBtnClick 오버라이드 정의
-            override fun onBtnClick() {
+            override fun onAddBtnClick() {
 
                 Log.d(TAG,"일정 추가 버튼 클릭 !!")
 

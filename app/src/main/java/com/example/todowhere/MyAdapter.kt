@@ -54,7 +54,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     }
 
-    // 뷰홀더가 재활용 됐을 때때
+    // 뷰홀더가 재활용 됐을 때
    override fun onBindViewHolder(holder: RecyclerView.ViewHolder , position: Int) {
         when(todo_datas[position].view_type) {
             0 -> {
@@ -69,20 +69,37 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     }
 
     // 인터페이스
-    interface onBtnClickListener {
-        fun onBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
+    interface onAddBtnClickListener {
+        fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
     }
     // 리스너 선언
-    private var listener : onBtnClickListener? = null
+    private var addListener : onAddBtnClickListener? = null
 
-    fun setonBtnClickListener(listener: onBtnClickListener) {
-        this.listener = listener
+    fun setonBtnClickListener(listener: onAddBtnClickListener) {
+        this.addListener = listener
     }
 
     // 목록에서 보여줄 아이템 개수
     override fun getItemCount(): Int {
         // 해당 요일 별로 realm에서 불러와서 카운트 + 1 -> 마지막은 일정 추가 버튼
         return Item
+
+    }
+
+    // 시간:분 형태로 표시
+    private fun HourMin(time:Long) : String {
+        var hour : Long = time / 3600
+        var min : Long = (time % 3600) / 60
+
+        if (hour < 10 && min < 10) {
+            return "0$hour : 0$min"
+        } else if (hour < 10 && min >= 10) {
+            return "0$hour : $min"
+        } else if (hour >= 10 && min < 10) {
+            return "$hour : 0$min"
+        } else {
+            return "$hour : $min"
+        }
 
     }
 
@@ -105,12 +122,16 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun bind(item:Todo) {
             // Realm 에서 데이터 불러와서 적용
             TodoTextView.text = item.what
-            TimerBtn.text = item.time.toString()
+            TimerBtn.text = HourMin(item.time)    // item.time.toString()
             MapBtn.setOnClickListener {
                 Log.d(TAG,"지도 버튼 클릭")
+                // 지도 다이어로그 띄우기
+                initMapBtnClicked()
             }
             delBtn.setOnClickListener {
                 Log.d(TAG,"삭제 버튼 클릭")
+                // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
+                initDelBtnClicked()
             }
 
 
@@ -133,10 +154,24 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
                 Log.d(TAG,"뷰 홀더에서 클릭 이벤트!!")
-                listener?.onBtnClick()
+                addListener?.onAddBtnClick()
             }
 
         }
+
+    }
+
+
+    // 지도 버튼을 클릭 했을을 경우 발생 벤트
+    private fun initMapBtnClicked() {
+
+    }
+
+
+    // 삭제 버튼을 클릭 했을 경우 발생 이벤트
+    private fun initDelBtnClicked() {
+        // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
+
 
     }
 

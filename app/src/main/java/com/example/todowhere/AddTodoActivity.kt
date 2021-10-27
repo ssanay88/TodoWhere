@@ -114,14 +114,17 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 등록 버튼 클릭 시 해당 데이터 등록
         addTodoBinding.AddButton.setOnClickListener {
-            insertTodo()
-            var next_intent = Intent(this, MainActivity::class.java).apply {
-                // 좌표의 위도, 경도 전송
-                putExtra("Lat",selected_Lat)
-                putExtra("Lng",selected_Lng)
-                putExtra("Time",goal_time)
+            if (insertTodo() == true) {
+                var next_intent = Intent(this, MainActivity::class.java).apply {
+                    // 좌표의 위도, 경도 전송
+                    putExtra("Lat", selected_Lat)
+                    putExtra("Lng", selected_Lng)
+                    putExtra("Time", goal_time)
+                }
+                startActivity(next_intent)
+            } else {
+                // 아무 실행 X
             }
-            startActivity(next_intent)
 
         }
 
@@ -160,8 +163,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 마지막 위치를 반환이지만 아직 위치 수신 전이면 null을 반환
         if (locationSource.lastLocation == null) {
-            selected_Lat = 37.5670135
-            selected_Lng = 126.9783740
+            selected_Lat = 0.0
+            selected_Lng = 0.0
         } else {
             selected_Lat = locationSource.lastLocation!!.latitude
             selected_Lng = locationSource.lastLocation!!.longitude
@@ -214,12 +217,17 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun checkPlan() : Boolean {
         // 할 일 텍스트 체크
         if (addTodoBinding.whatTodoText.text.toString().isBlank()) {
-            Toast.makeText(this,"해야하는 일을 입력하여 주세요",Toast.LENGTH_LONG).show()
+            Toast.makeText(this,"해야하는 일을 입력하여 주세요",Toast.LENGTH_SHORT).show()
             return false
         }
         // 목표 시간 체크
         else if (goal_time == 0) {
-            Toast.makeText(this,"목표 시간을 입력하여 주세요",Toast.LENGTH_LONG).show()
+            Toast.makeText(this,"목표 시간을 입력하여 주세요",Toast.LENGTH_SHORT).show()
+            return false
+        }
+        // 목표 위치 체크
+        else if (selected_Lat == 0.0 || selected_Lng == 0.0) {
+            Toast.makeText(this,"목표 위치를 선택하여 주세요",Toast.LENGTH_SHORT).show()
             return false
         }
 
@@ -231,10 +239,11 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
     // Realm DB에 데이터 추가
-    private fun insertTodo() {
+    private fun insertTodo() : Boolean {
 
         if (checkPlan() == false) {
             // 다시 계획이 올바르게 들어갔는지 확인
+            return false
         }
         else
         {
@@ -261,6 +270,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             )
 
             realm.commitTransaction()   // 트랜잭션 종료 반영
+            return true
         }
 
     }

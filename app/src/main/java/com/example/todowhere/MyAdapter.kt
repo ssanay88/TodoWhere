@@ -1,5 +1,7 @@
 package com.example.todowhere
 
+import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -38,6 +40,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         // 연결할 레이아웃 설정
         val view : View?
+
         return when(viewType) {
             // 일정이 없는 경우 일정 추가 버튼만 출력
             0 -> {
@@ -106,9 +109,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
-    inner class MyViewHolder_Update(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder_Update(view: View, parent: ViewGroup) : RecyclerView.ViewHolder(view) {
 
         val TAG : String = "로그"
+        // val ActivityContext =
 
         private val TodoTextView : TextView = view.findViewById(R.id.todoText)
         private val TimerBtn : Button = view.findViewById(R.id.timer_button)
@@ -121,19 +125,60 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         fun bind(item:Todo) {
             // Realm 에서 데이터 불러와서 적용
+
             TodoTextView.text = item.what
             TimerBtn.text = HourMin(item.time)    // item.time.toString()
             MapBtn.setOnClickListener {
                 Log.d(TAG,"지도 버튼 클릭")
                 // 지도 다이어로그 띄우기
+
                 initMapBtnClicked()
             }
             delBtn.setOnClickListener {
-                Log.d(TAG,"삭제 버튼 클릭")
+                Log.d(TAG,"삭제 버튼 클릭 삭제 ID : ${item.id}")
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
-                initDelBtnClicked()
+                initDelBtnClicked(item.id)
             }
 
+
+        }
+
+        // 지도 버튼을 클릭 했을을 경우 발생 벤트
+        fun initMapBtnClicked() {
+
+        }
+
+
+        // 삭제 버튼을 클릭 했을 경우 발생 이벤트
+        // 10.28 Context 불러오기 검색
+        fun initDelBtnClicked(ID:String) {
+            Log.d(TAG, "삭제 버튼 발동")
+            // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
+            AlertDialog.Builder(context)
+                .setTitle("일정 삭제")
+                .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
+                .setPositiveButton("삭제",{ _,_ ->
+                    // Todo DB에서 해당 일정 삭제
+                    deleteFromDB(ID)
+                })
+                .setNegativeButton("취소" ,{ _,_ ->
+                    // 팝업 닫기
+                })
+
+
+        }
+
+        fun deleteFromDB(ID: String) {
+
+            realm.beginTransaction()
+
+            var result = realm.where<Todo>().equalTo("id",ID).findFirst()
+            if (result != null) {
+                Log.d(ContentValues.TAG, "삭제 result : $result")
+                result.deleteFromRealm()
+            }
+
+            realm.commitTransaction()
 
         }
 
@@ -162,18 +207,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     }
 
 
-    // 지도 버튼을 클릭 했을을 경우 발생 벤트
-    private fun initMapBtnClicked() {
 
-    }
-
-
-    // 삭제 버튼을 클릭 했을 경우 발생 이벤트
-    private fun initDelBtnClicked() {
-        // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
-
-
-    }
 
 
 

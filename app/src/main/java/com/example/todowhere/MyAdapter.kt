@@ -40,6 +40,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         // 연결할 레이아웃 설정
         val view : View?
+        var parent_context = parent.context
 
         return when(viewType) {
             // 일정이 없는 경우 일정 추가 버튼만 출력
@@ -50,7 +51,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 일정을 정리하여 보여주는 뷰홀더
             else -> {
                 view = LayoutInflater.from(context).inflate(R.layout.todo_list, parent, false)
-                MyViewHolder_Update(view)
+                MyViewHolder_Update(view , parent_context)
             }
 
         }
@@ -109,10 +110,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
-    inner class MyViewHolder_Update(view: View, parent: ViewGroup) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder_Update(view: View , pContext: Context) : RecyclerView.ViewHolder(view) {
 
         val TAG : String = "로그"
-        // val ActivityContext =
+        val ActivityContext = pContext
 
         private val TodoTextView : TextView = view.findViewById(R.id.todoText)
         private val TimerBtn : Button = view.findViewById(R.id.timer_button)
@@ -137,7 +138,8 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             delBtn.setOnClickListener {
                 Log.d(TAG,"삭제 버튼 클릭 삭제 ID : ${item.id}")
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
-                initDelBtnClicked(item.id)
+                initDelBtnClicked(item.id , ActivityContext)
+
             }
 
 
@@ -151,19 +153,21 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         // 삭제 버튼을 클릭 했을 경우 발생 이벤트
         // 10.28 Context 불러오기 검색
-        fun initDelBtnClicked(ID:String) {
+        fun initDelBtnClicked(ID:String , ActivityContext:Context) {
             Log.d(TAG, "삭제 버튼 발동")
             // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
-            AlertDialog.Builder(context)
+            AlertDialog.Builder(ActivityContext)
                 .setTitle("일정 삭제")
                 .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
                 .setPositiveButton("삭제",{ _,_ ->
                     // Todo DB에서 해당 일정 삭제
                     deleteFromDB(ID)
+
                 })
                 .setNegativeButton("취소" ,{ _,_ ->
                     // 팝업 닫기
                 })
+                .show()
 
 
         }

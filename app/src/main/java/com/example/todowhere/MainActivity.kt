@@ -162,7 +162,6 @@ class MainActivity : AppCompatActivity() {
 
             myAdapter.todo_datas = realmResult
 
-
             // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
             myAdapter.Item = find_Item_Count(selected_date)
 
@@ -240,7 +239,7 @@ class MainActivity : AppCompatActivity() {
     // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
     override fun onResume() {
         super.onResume()
-        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+
 
         var realmResult =
             realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
@@ -299,6 +298,7 @@ class MainActivity : AppCompatActivity() {
         val realmResult = realm.where<Todo>().contains("id",date).findAll()
 
         Log.d(TAG," 지금 아이템 수 : ${realmResult.size}")
+
         return realmResult.size
 
     }
@@ -520,6 +520,11 @@ class MainActivity : AppCompatActivity() {
         // adapter에게 Data가 변했다는 것을 알려줍니다.
         myAdapter.notifyDataSetChanged()
         //myAdapter.notifyItemRemoved()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()   // 인스턴스 해제
     }
 
 

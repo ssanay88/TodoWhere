@@ -25,9 +25,7 @@ import org.w3c.dom.Text
 // 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
 class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-
-    val realm = Realm.getDefaultInstance()
-
+//    val realm = Realm.getDefaultInstance()
 
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
@@ -104,23 +102,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     }
 
-    // 시간:분 형태로 표시
-    private fun HourMin(time:Long) : String {
-        var hour : Long = time / 3600
-        var min : Long = (time % 3600) / 60
-
-        if (hour < 10 && min < 10) {
-            return "0$hour : 0$min"
-        } else if (hour < 10 && min >= 10) {
-            return "0$hour : $min"
-        } else if (hour >= 10 && min < 10) {
-            return "$hour : 0$min"
-        } else {
-            return "$hour : $min"
-        }
-
-    }
-
 
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
@@ -170,39 +151,25 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         // 삭제 버튼을 클릭 했을 경우 발생 이벤트
         // 10.28 Context 불러오기 검색
-        fun initDelBtnClicked(ID:String , ActivityContext:Context) {
-            Log.d(TAG, "삭제 버튼 발동")
-            // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
-            AlertDialog.Builder(ActivityContext)
-                .setTitle("일정 삭제")
-                .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
-                .setPositiveButton("삭제",{ _,_ ->
-                    // Todo DB에서 해당 일정 삭제
-                    deleteFromDB(ID)
-                    notifyDataSetChanged()
+//        fun initDelBtnClicked(ID:String , ActivityContext:Context) {
+//            Log.d(TAG, "삭제 버튼 발동")
+//            // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
+//            AlertDialog.Builder(ActivityContext)
+//                .setTitle("일정 삭제")
+//                .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
+//                .setPositiveButton("삭제",{ _,_ ->
+//                    // Todo DB에서 해당 일정 삭제
+//                    notifyDataSetChanged()
+//
+//                })
+//                .setNegativeButton("취소" ,{ _,_ ->
+//                    // 팝업 닫기
+//                })
+//                .show()
+//
+//
+//        }
 
-                })
-                .setNegativeButton("취소" ,{ _,_ ->
-                    // 팝업 닫기
-                })
-                .show()
-
-
-        }
-
-        fun deleteFromDB(ID: String) {
-
-            realm.beginTransaction()
-
-            var result = realm.where<Todo>().equalTo("id",ID).findFirst()
-            if (result != null) {
-                Log.d(ContentValues.TAG, "삭제 result : $result")
-                result.deleteFromRealm()
-            }
-
-            realm.commitTransaction()
-
-        }
 
     }
 
@@ -224,6 +191,23 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                 addListener?.onAddBtnClick()
             }
 
+        }
+
+    }
+
+    // 시간:분 형태로 표시
+    private fun HourMin(time:Long) : String {
+        var hour : Long = time / 3600
+        var min : Long = (time % 3600) / 60
+
+        if (hour < 10 && min < 10) {
+            return "0$hour : 0$min"
+        } else if (hour < 10 && min >= 10) {
+            return "0$hour : $min"
+        } else if (hour >= 10 && min < 10) {
+            return "$hour : 0$min"
+        } else {
+            return "$hour : $min"
         }
 
     }

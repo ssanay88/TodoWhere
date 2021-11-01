@@ -175,10 +175,8 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
-        myAdapter.setonBtnClickListener(object : MyAdapter.onAddBtnClickListener {
+        myAdapter.setonAddBtnClickListener(object : MyAdapter.onAddBtnClickListener {
 
             // onBtnClick 오버라이드 정의
             override fun onAddBtnClick() {
@@ -199,6 +197,33 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // 리사이클러뷰 아이템 삭제 버튼 클릭 시
+        myAdapter.setonDelBtnClickListener(object : MyAdapter.onDelBtnClickListener {
+
+            override fun onDelBtnClick(todo: Todo) {
+
+                Log.d(TAG , "일정 삭제 버튼 클릭 !!")
+
+                // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle("일정 삭제")
+                    .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
+                    .setPositiveButton("삭제",{ _,_ ->
+                        // Todo DB에서 해당 일정 삭제
+                        deleteFromDB(todo.id)
+                        myAdapter.notifyDataSetChanged()
+                        // myAdapter.notifyItemRemoved(idx)
+
+                    })
+                    .setNegativeButton("취소" ,{ _,_ ->
+                        // 팝업 닫기
+                    }).show()
+            }
+
+        })
+
+
+        // 활동 기록을 위한 상태 체크
         mainBinding.StartStopBtn.setOnClickListener {
             if (app_state == "Start") {
                 mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_play_arrow_24)
@@ -248,7 +273,6 @@ class MainActivity : AppCompatActivity() {
         addGeofences()    // geofencing 추가
 
     }
-
 
 
     // 날짜를 원하는 8자리로 만들어주는 함수
@@ -453,6 +477,49 @@ class MainActivity : AppCompatActivity() {
         }
 
         return dueDate.timeInMillis - currentDate.timeInMillis
+    }
+
+    fun deleteFromDB(ID: String) {
+
+        realm.beginTransaction()
+
+        var result = realm.where<Todo>().equalTo("id",ID).findFirst()
+        if (result != null) {
+            Log.d(ContentValues.TAG, "삭제 result : $result")
+            result.deleteFromRealm()
+        }
+
+        realm.commitTransaction()
+
+    }
+
+    fun updateRecyclerView() {
+        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+
+        var realmResult =
+            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+
+        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+        if (realmResult.size == 0 ) {
+            add_blank_data(selected_date)
+        }
+
+        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        mainBinding.TodoRecyclerView.adapter = myAdapter
+
+
+        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
+        val layout = LinearLayoutManager(this)
+        mainBinding.TodoRecyclerView.layoutManager = layout
+        myAdapter.todo_datas = realmResult
+
+
+        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+        myAdapter.Item = find_Item_Count(selected_date)
+
+        // adapter에게 Data가 변했다는 것을 알려줍니다.
+        myAdapter.notifyDataSetChanged()
+        //myAdapter.notifyItemRemoved()
     }
 
 

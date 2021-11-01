@@ -76,12 +76,26 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     interface onAddBtnClickListener {
         fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
     }
+
+    interface onDelBtnClickListener {
+        fun onDelBtnClick(todo: Todo)
+    }
+
     // 리스너 선언
     private var addListener : onAddBtnClickListener? = null
+    private var delListener : onDelBtnClickListener? = null
 
-    fun setonBtnClickListener(listener: onAddBtnClickListener) {
+    fun setonAddBtnClickListener(listener: onAddBtnClickListener) {
         this.addListener = listener
     }
+
+    fun setonDelBtnClickListener(listener: onDelBtnClickListener) {
+        this.delListener = listener
+    }
+
+
+
+
 
     // 목록에서 보여줄 아이템 개수
     override fun getItemCount(): Int {
@@ -129,16 +143,19 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
             TodoTextView.text = item.what
             TimerBtn.text = HourMin(item.time)    // item.time.toString()
+
+
             MapBtn.setOnClickListener {
                 Log.d(TAG,"지도 버튼 클릭")
                 // 지도 다이어로그 띄우기
-
                 initMapBtnClicked()
             }
             delBtn.setOnClickListener {
                 Log.d(TAG,"삭제 버튼 클릭 삭제 ID : ${item.id}")
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
-                initDelBtnClicked(item.id , ActivityContext)
+                delListener?.onDelBtnClick(item)
+
+                //initDelBtnClicked(item.id , ActivityContext)
 
             }
 
@@ -162,6 +179,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                 .setPositiveButton("삭제",{ _,_ ->
                     // Todo DB에서 해당 일정 삭제
                     deleteFromDB(ID)
+                    notifyDataSetChanged()
 
                 })
                 .setNegativeButton("취소" ,{ _,_ ->

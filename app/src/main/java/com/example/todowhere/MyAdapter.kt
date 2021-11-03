@@ -49,7 +49,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 일정을 정리하여 보여주는 뷰홀더
             else -> {
                 view = LayoutInflater.from(context).inflate(R.layout.todo_list, parent, false)
-                MyViewHolder_Update(view , parent_context)
+                MyViewHolder_Update(view)
             }
 
         }
@@ -70,6 +70,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     }
 
+
     // 인터페이스
     interface onAddBtnClickListener {
         fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
@@ -83,12 +84,12 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     private var addListener : onAddBtnClickListener? = null
     private var delListener : onDelBtnClickListener? = null
 
-    fun setonAddBtnClickListener(listener: onAddBtnClickListener) {
-        this.addListener = listener
+    fun setonAddBtnClickListener(addListener: onAddBtnClickListener) {
+        this.addListener = addListener
     }
 
-    fun setonDelBtnClickListener(listener: onDelBtnClickListener) {
-        this.delListener = listener
+    fun setonDelBtnClickListener(delListener: onDelBtnClickListener) {
+        this.delListener = delListener
     }
 
 
@@ -105,10 +106,9 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
-    inner class MyViewHolder_Update(view: View , pContext: Context) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder_Update(view: View) : RecyclerView.ViewHolder(view) {
 
         val TAG : String = "로그"
-        val ActivityContext = pContext
 
         private val TodoTextView : TextView = view.findViewById(R.id.todoText)
         private val TimerBtn : Button = view.findViewById(R.id.timer_button)
@@ -131,6 +131,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                 // 지도 다이어로그 띄우기
                 initMapBtnClicked()
             }
+
             delBtn.setOnClickListener {
                 Log.d(TAG,"삭제 버튼 클릭 삭제 ID : ${item.id}")
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
@@ -147,28 +148,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun initMapBtnClicked() {
 
         }
-
-
-        // 삭제 버튼을 클릭 했을 경우 발생 이벤트
-        // 10.28 Context 불러오기 검색
-//        fun initDelBtnClicked(ID:String , ActivityContext:Context) {
-//            Log.d(TAG, "삭제 버튼 발동")
-//            // Todo 1. 삭제할건지 다시 묻는 Dialog   2. 삭제 시 DB에서 데이터 삭제 및 아이템 개수 -1
-//            AlertDialog.Builder(ActivityContext)
-//                .setTitle("일정 삭제")
-//                .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
-//                .setPositiveButton("삭제",{ _,_ ->
-//                    // Todo DB에서 해당 일정 삭제
-//                    notifyDataSetChanged()
-//
-//                })
-//                .setNegativeButton("취소" ,{ _,_ ->
-//                    // 팝업 닫기
-//                })
-//                .show()
-//
-//
-//        }
 
 
     }

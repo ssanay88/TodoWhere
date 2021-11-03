@@ -113,8 +113,7 @@ class MainActivity : AppCompatActivity() {
         selected_date = getDate(selected_year,selected_month,selected_day)
 
 
-        var realmResult =
-            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+        var realmResult = realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
 
 
         // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
@@ -133,7 +132,6 @@ class MainActivity : AppCompatActivity() {
         // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
         val layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
-
 
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
@@ -169,8 +167,10 @@ class MainActivity : AppCompatActivity() {
             myAdapter.notifyDataSetChanged()
 
 
+
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
+            Log.d(TAG, "DB : $realmResult")
         }
 
 
@@ -189,7 +189,6 @@ class MainActivity : AppCompatActivity() {
 
                     putExtra("DATE", selected_date)
                     putExtra("TIME", cur_time_form)
-
 
                 }
                 startActivity(next_intent)
@@ -277,18 +276,22 @@ class MainActivity : AppCompatActivity() {
     // 날짜를 원하는 8자리로 만들어주는 함수
    fun getDate(year : Int , month : Int , day : Int) : String {
 
-        var date : String
+        var month_str : String
+        var day_str : String
 
         if (month < 10) {
-            date =
-                year.toString() + '0' + month.toString() + day.toString()
-
+            month_str = '0' + month.toString()
         } else {
-            date =
-                year.toString() + month.toString() + day.toString()
+            month_str = month.toString()
         }
 
-        return date
+        if (day < 10) {
+            day_str = '0' + day.toString()
+        } else {
+            day_str = day.toString()
+        }
+
+        return year.toString() + month_str + day_str
 
     }
 

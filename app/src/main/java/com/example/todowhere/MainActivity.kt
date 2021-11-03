@@ -125,12 +125,12 @@ class MainActivity : AppCompatActivity() {
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        var myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
         mainBinding.TodoRecyclerView.adapter = myAdapter
 
 
         // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val layout = LinearLayoutManager(this)
+        var layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
 

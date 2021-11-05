@@ -156,7 +156,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         val TAG: String = "로그"
 
-        val addBtn: Button = view.findViewById(R.id.todo_add_button)
+        private var addBtn: Button = view.findViewById(R.id.todo_add_button)
 
         init {
             Log.d(TAG, "MyViewHolder_Add called!!")
@@ -165,8 +165,14 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun bind() {
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
-                Log.d(TAG,"뷰 홀더에서 클릭 이벤트!!")
-                addListener?.onAddBtnClick()
+
+                if (addListener == null) {
+                    Log.d(TAG,"Add 이벤트 But addListener 없음!")
+                } else {
+                    addListener?.onAddBtnClick()
+                }
+
+
             }
         }
 

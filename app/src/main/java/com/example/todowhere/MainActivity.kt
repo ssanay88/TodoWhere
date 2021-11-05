@@ -232,7 +232,6 @@ class MainActivity : AppCompatActivity() {
                 mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_stop_24)
                 app_state = "Start"
             }
-
         }
     }
 

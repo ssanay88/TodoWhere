@@ -12,6 +12,17 @@
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2021-11-03T10:23:04.128335200Z" />
+    <targetSelectedWithDropDown>
+      <Target>
+        <type value="COLD_BOOT_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\ppllo\.android\avd\Pixel_3a_API_30_x86.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+    </targetSelectedWithDropDown>
+    <timeTargetWasSelectedWithDropDown value="2021-11-05T07:12:25.429965700Z" />
   </component>
 </project>

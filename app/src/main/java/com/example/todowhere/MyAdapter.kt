@@ -38,7 +38,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         // 연결할 레이아웃 설정
         val view : View?
-        var parent_context = parent.context
 
         return when(viewType) {
             // 일정이 없는 경우 일정 추가 버튼만 출력
@@ -84,12 +83,12 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     private var addListener : onAddBtnClickListener? = null
     private var delListener : onDelBtnClickListener? = null
 
-    fun setonAddBtnClickListener(addListener: onAddBtnClickListener) {
-        this.addListener = addListener
+    fun setonAddBtnClickListener(listener: onAddBtnClickListener) {
+        this.addListener = listener
     }
 
-    fun setonDelBtnClickListener(delListener: onDelBtnClickListener) {
-        this.delListener = delListener
+    fun setonDelBtnClickListener(listener: onDelBtnClickListener) {
+        this.delListener = listener
     }
 
 
@@ -144,7 +143,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         }
 
-        // 지도 버튼을 클릭 했을을 경우 발생 벤트
+        // 지도 버튼을 클릭 했을을 경우 발생 이벤트
         fun initMapBtnClicked() {
 
         }
@@ -169,7 +168,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                 Log.d(TAG,"뷰 홀더에서 클릭 이벤트!!")
                 addListener?.onAddBtnClick()
             }
-
         }
 
     }

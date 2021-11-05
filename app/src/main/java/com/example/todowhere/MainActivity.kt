@@ -125,12 +125,12 @@ class MainActivity : AppCompatActivity() {
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
-        var myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
         mainBinding.TodoRecyclerView.adapter = myAdapter
 
 
         // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
-        var layout = LinearLayoutManager(this)
+        val layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
 
@@ -194,6 +194,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(next_intent)
             }
         })
+
 
         // 리사이클러뷰 아이템 삭제 버튼 클릭 시
         myAdapter.setonDelBtnClickListener(object : MyAdapter.onDelBtnClickListener {

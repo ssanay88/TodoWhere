@@ -64,9 +64,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             else -> {
                 (holder as MyViewHolder_Update).bind(todo_datas[position])
             }
-
         }
-
     }
 
 
@@ -80,11 +78,11 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     }
 
     // 리스너 선언
-    private var addListener : onAddBtnClickListener? = null
+    private var listener : onAddBtnClickListener? = null
     private var delListener : onDelBtnClickListener? = null
 
     fun setonAddBtnClickListener(listener: onAddBtnClickListener) {
-        this.addListener = listener
+        this.listener = listener
     }
 
     fun setonDelBtnClickListener(listener: onDelBtnClickListener) {
@@ -166,10 +164,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
 
-                if (addListener == null) {
+                if (listener == null) {
                     Log.d(TAG,"Add 이벤트 But addListener 없음!")
                 } else {
-                    addListener?.onAddBtnClick()
+                    listener?.onAddBtnClick()
                 }
 
 

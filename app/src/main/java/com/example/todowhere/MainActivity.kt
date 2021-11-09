@@ -211,7 +211,6 @@ class MainActivity : AppCompatActivity() {
                         // Todo DB에서 해당 일정 삭제
                         deleteFromDB(todo.id)
                         myAdapter.notifyDataSetChanged()
-                        // myAdapter.notifyItemRemoved(idx)
 
                     })
                     .setNegativeButton("취소" ,{ _,_ ->

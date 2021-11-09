@@ -16,9 +16,11 @@ import java.util.*
 import kotlin.concurrent.timer
 
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
+// TODO 에러 ) 브로드캐스트리시버에는 변수를 넣어서 정의하면 안된다!!
 class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
 
     var TAG: String = "로그"
+
 
     var progressingGeofences : MutableList<Geofence> = mutableListOf()
 
@@ -36,7 +38,7 @@ class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
 
     // private val geofenceCountDownTimer:CountDownTimer = object : CountDownTimer()    // 목표 시간동안 카운트 다운을 진행할 변수
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent) {
 
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
 
@@ -102,8 +104,9 @@ class GeofenceBroadcastReceiver(var appState:String) : BroadcastReceiver() {
             }
 
         }    // appState가 Start일 경우에만 진행
-
-        timerTask?.cancel()    // appState가 Stop일 경우 타이머 종료
+        else {
+            timerTask?.cancel()    // appState가 Stop일 경우 타이머 종료
+        }
 
     }
 

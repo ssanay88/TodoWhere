@@ -25,7 +25,29 @@ import org.w3c.dom.Text
 // 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
 class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-//    val realm = Realm.getDefaultInstance()
+
+    // 인터페이스
+    interface onAddBtnClickListener {
+        fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
+    }
+    interface onDelBtnClickListener {
+        fun onDelBtnClick(todo: Todo)
+    }
+
+    // 리스너 선언
+    private var addlistener : onAddBtnClickListener? = null
+    private var delListener : onDelBtnClickListener? = null
+
+    // Todo 11.11 지금 여기가 작동 X
+    fun setOnAddBtnClickListener(listener: onAddBtnClickListener) {
+        Log.d(TAG , "setOnAddBtnClickListener 실행")
+        addlistener = listener
+    }
+
+    fun setOnDelBtnClickListener(listener: onDelBtnClickListener) {
+        this.delListener = listener
+    }
+
 
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
@@ -67,40 +89,11 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         }
     }
 
-
-    // 인터페이스
-    interface onAddBtnClickListener {
-        fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
-    }
-
-    interface onDelBtnClickListener {
-        fun onDelBtnClick(todo: Todo)
-    }
-
-    // 리스너 선언
-    private var listener : onAddBtnClickListener? = null
-    private var delListener : onDelBtnClickListener? = null
-
-    fun setonAddBtnClickListener(listener: onAddBtnClickListener) {
-        this.listener = listener
-    }
-
-    fun setonDelBtnClickListener(listener: onDelBtnClickListener) {
-        this.delListener = listener
-    }
-
-
-
-
-
     // 목록에서 보여줄 아이템 개수
     override fun getItemCount(): Int {
         // 해당 요일 별로 realm에서 불러와서 카운트 + 1 -> 마지막은 일정 추가 버튼
         return Item
-
     }
-
-
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
     inner class MyViewHolder_Update(view: View) : RecyclerView.ViewHolder(view) {
@@ -134,10 +127,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
                 delListener?.onDelBtnClick(item)
 
-                //initDelBtnClicked(item.id , ActivityContext)
-
             }
-
 
         }
 
@@ -154,7 +144,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         val TAG: String = "로그"
 
-        private var addBtn: Button = view.findViewById(R.id.todo_add_button)
+        private val addBtn: Button = view.findViewById(R.id.todo_add_button)
 
         init {
             Log.d(TAG, "MyViewHolder_Add called!!")
@@ -164,10 +154,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
 
-                if (listener == null) {
+                if (addlistener == null) {
                     Log.d(TAG,"Add 이벤트 But addListener 없음!")
                 } else {
-                    listener?.onAddBtnClick()
+                    addlistener?.onAddBtnClick()
                 }
 
 

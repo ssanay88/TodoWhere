@@ -69,24 +69,26 @@ class MainActivity : AppCompatActivity() {
     var saved_Lng : Double = 0.0
     var saved_time : Int = 0
 
+    // Floating Button을 통한 진행 상태 판단하기 위한 변수
+    // Start = 일정 실행을 측정하고 있는 상태 , Stop = 일정 실행 측정 종료 상태
+    private var app_state = "Stop"
+
     // Location API를 사용하기 위한 geofencing client 인스턴스 생성
     private val geofencingClient : GeofencingClient by lazy {
         LocationServices.getGeofencingClient(this)
     }
 
     // BroadcastReceiver를 시작하는 PendingIntent 정의
+    // appState를 인텐트로 넘겨줘야함
     private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver(app_state)::class.java)
+        val intent = Intent(this, GeofenceBroadcastReceiver()::class.java)
+        intent.putExtra("appState",app_state)
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
+
     // Geofencing을 저장할 리스트
-    public val geofenceList : MutableList<Geofence> = mutableListOf()
-
-
-    // Floating Button을 통한 진행 상태 판단하기 위한 변수
-    // Start = 일정 실행을 측정하고 있는 상태 , Stop = 일정 실행 측정 종료 상태
-    private var app_state = "Stop"
+    val geofenceList : MutableList<Geofence> = mutableListOf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -167,7 +169,6 @@ class MainActivity : AppCompatActivity() {
             myAdapter.notifyDataSetChanged()
 
 
-
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
             Log.d(TAG, "DB : $realmResult")
@@ -175,7 +176,11 @@ class MainActivity : AppCompatActivity() {
 
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
-        myAdapter.setonAddBtnClickListener(object : MyAdapter.onAddBtnClickListener {
+        myAdapter.setOnAddBtnClickListener(object : MyAdapter.onAddBtnClickListener {
+
+            init {
+                Log.d(TAG,"setOnAddBtnClickListener 실행!!")
+            }
 
             // onBtnClick 오버라이드 정의
             override fun onAddBtnClick() {
@@ -189,7 +194,6 @@ class MainActivity : AppCompatActivity() {
 
                     putExtra("DATE", selected_date)
                     putExtra("TIME", cur_time_form)
-
                 }
                 startActivity(next_intent)
             }
@@ -197,7 +201,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // 리사이클러뷰 아이템 삭제 버튼 클릭 시
-        myAdapter.setonDelBtnClickListener(object : MyAdapter.onDelBtnClickListener {
+        myAdapter.setOnDelBtnClickListener(object : MyAdapter.onDelBtnClickListener {
 
             override fun onDelBtnClick(todo: Todo) {
 
@@ -225,10 +229,12 @@ class MainActivity : AppCompatActivity() {
         mainBinding.StartStopBtn.setOnClickListener {
             if (app_state == "Start") {
                 mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                Log.d(TAG,"now app state : $app_state")
                 app_state = "Stop"
             }
             else {
                 mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_stop_24)
+                Log.d(TAG,"now app state : $app_state")
                 app_state = "Start"
             }
         }

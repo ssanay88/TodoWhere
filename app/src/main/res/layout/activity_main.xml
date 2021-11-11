@@ -14,14 +14,14 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/TodoRecyclerView"
+        app:layout_constraintBottom_toTopOf="@+id/Todo_RecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/TodoRecyclerView"
+        android:id="@+id/Todo_RecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -41,11 +41,11 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:elevation="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/TodoRecyclerView"
-        app:layout_constraintEnd_toEndOf="@+id/TodoRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@+id/Todo_RecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/Todo_RecyclerView"
         app:layout_constraintHorizontal_bias="0.049"
-        app:layout_constraintStart_toStartOf="@+id/TodoRecyclerView"
-        app:layout_constraintTop_toTopOf="@+id/TodoRecyclerView"
+        app:layout_constraintStart_toStartOf="@+id/Todo_RecyclerView"
+        app:layout_constraintTop_toTopOf="@+id/Todo_RecyclerView"
         app:layout_constraintVertical_bias="0.951"
         app:srcCompat="@drawable/ic_baseline_play_arrow_24"
         tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck" />

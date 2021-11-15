@@ -90,6 +90,8 @@ class MainActivity : AppCompatActivity() {
     // Geofencing을 저장할 리스트
     val geofenceList : MutableList<Geofence> = mutableListOf()
 
+    lateinit var myAdapter: MyAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,7 +129,7 @@ class MainActivity : AppCompatActivity() {
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
         mainBinding.TodoRecyclerView.adapter = myAdapter
 
 
@@ -168,7 +170,6 @@ class MainActivity : AppCompatActivity() {
             // adapter에게 Data가 변했다는 것을 알려줍니다.
             myAdapter.notifyDataSetChanged()
 
-
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
             Log.d(TAG, "DB : $realmResult")
@@ -176,11 +177,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
-        myAdapter.setOnAddBtnClickListener(object : MyAdapter.onAddBtnClickListener {
-
-            init {
-                Log.d(TAG,"setOnAddBtnClickListener 실행!!")
-            }
+        myAdapter.setOnAddBtnClickListener(object : MyAdapter.OnAddBtnClickListener {
 
             // onBtnClick 오버라이드 정의
             override fun onAddBtnClick() {
@@ -201,7 +198,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // 리사이클러뷰 아이템 삭제 버튼 클릭 시
-        myAdapter.setOnDelBtnClickListener(object : MyAdapter.onDelBtnClickListener {
+        myAdapter.setOnDelBtnClickListener(object : MyAdapter.OnDelBtnClickListener {
 
             override fun onDelBtnClick(todo: Todo) {
 

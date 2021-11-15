@@ -26,25 +26,27 @@ import org.w3c.dom.Text
 class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
+    private val TAG = "로그"
+
     // 인터페이스
-    interface onAddBtnClickListener {
+    interface OnAddBtnClickListener {
         fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
     }
-    interface onDelBtnClickListener {
+    interface OnDelBtnClickListener {
         fun onDelBtnClick(todo: Todo)
     }
 
     // 리스너 선언
-    private var addlistener : onAddBtnClickListener? = null
-    private var delListener : onDelBtnClickListener? = null
+    private var addListener : OnAddBtnClickListener? = null
+    private var delListener : OnDelBtnClickListener? = null
 
     // Todo 11.11 지금 여기가 작동 X
-    fun setOnAddBtnClickListener(listener: onAddBtnClickListener) {
+    fun setOnAddBtnClickListener(listener:OnAddBtnClickListener) {
         Log.d(TAG , "setOnAddBtnClickListener 실행")
-        addlistener = listener
+        this.addListener = listener
     }
 
-    fun setOnDelBtnClickListener(listener: onDelBtnClickListener) {
+    fun setOnDelBtnClickListener(listener:OnDelBtnClickListener) {
         this.delListener = listener
     }
 
@@ -100,9 +102,9 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         val TAG : String = "로그"
 
-        private val TodoTextView : TextView = view.findViewById(R.id.todoText)
-        private val TimerBtn : Button = view.findViewById(R.id.timer_button)
-        private val MapBtn : ImageButton = view.findViewById(R.id.map_button)
+        private val todoTextView : TextView = view.findViewById(R.id.todoText)
+        private val timerBtn : Button = view.findViewById(R.id.timer_button)
+        private val mapBtn : ImageButton = view.findViewById(R.id.map_button)
         private val delBtn : ImageButton = view.findViewById(R.id.delete_button)
 
         init {
@@ -112,11 +114,11 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun bind(item:Todo) {
             // Realm 에서 데이터 불러와서 적용
 
-            TodoTextView.text = item.what
-            TimerBtn.text = HourMin(item.time)    // item.time.toString()
+            todoTextView.text = item.what
+            timerBtn.text = HourMin(item.time)    // item.time.toString()
 
 
-            MapBtn.setOnClickListener {
+            mapBtn.setOnClickListener {
                 Log.d(TAG,"지도 버튼 클릭")
                 // 지도 다이어로그 띄우기
                 initMapBtnClicked()
@@ -154,12 +156,8 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
 
-                if (addlistener == null) {
-                    Log.d(TAG,"Add 이벤트 But addListener 없음!")
-                } else {
-                    addlistener?.onAddBtnClick()
-                }
-
+                Log.d(TAG,"뷰홀더에서 클릭 이벤트!!")
+                addListener?.onAddBtnClick()
 
             }
         }

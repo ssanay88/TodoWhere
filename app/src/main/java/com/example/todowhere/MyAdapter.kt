@@ -28,28 +28,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     private val TAG = "로그"
 
-    // 인터페이스
-    interface OnAddBtnClickListener {
-        fun onAddBtnClick()    // 클릭된 순간 로직을 담을 추상 메소드
-    }
-    interface OnDelBtnClickListener {
-        fun onDelBtnClick(todo: Todo)
-    }
-
-    // 리스너 선언
-    private var addListener : OnAddBtnClickListener? = null
-    private var delListener : OnDelBtnClickListener? = null
-
-    // Todo 11.11 지금 여기가 작동 X
-    fun setOnAddBtnClickListener(listener:OnAddBtnClickListener) {
-        Log.d(TAG , "setOnAddBtnClickListener 실행")
-        this.addListener = listener
-    }
-
-    fun setOnDelBtnClickListener(listener:OnDelBtnClickListener) {
-        this.delListener = listener
-    }
-
+    val realm = Realm.getDefaultInstance()
 
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
@@ -91,6 +70,45 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         }
     }
 
+    // 리스너 선언
+    private var addListener : OnAddBtnClickListener? = null
+    private var delListener : OnDelBtnClickListener? = null
+
+    // 인터페이스
+    interface OnAddBtnClickListener {
+        fun onClick()    // 클릭된 순간 로직을 담을 추상 메소드
+    }
+    interface OnDelBtnClickListener {
+        fun onClick(todo: Todo)
+    }
+
+    // Todo 11.11 지금 여기가 작동 X
+    fun setOnAddBtnClickListener(listener:OnAddBtnClickListener) {
+        Log.d(TAG , "setOnAddBtnClickListener 실행")
+        this.addListener = listener
+    }
+
+    fun setOnDelBtnClickListener(listener:OnDelBtnClickListener) {
+        this.delListener = listener
+    }
+
+    // 시간:분 형태로 표시
+    private fun HourMin(time:Long) : String {
+        var hour : Long = time / 3600
+        var min : Long = (time % 3600) / 60
+
+        if (hour < 10 && min < 10) {
+            return "0$hour : 0$min"
+        } else if (hour < 10 && min >= 10) {
+            return "0$hour : $min"
+        } else if (hour >= 10 && min < 10) {
+            return "$hour : 0$min"
+        } else {
+            return "$hour : $min"
+        }
+
+    }
+
     // 목록에서 보여줄 아이템 개수
     override fun getItemCount(): Int {
         // 해당 요일 별로 realm에서 불러와서 카운트 + 1 -> 마지막은 일정 추가 버튼
@@ -127,7 +145,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             delBtn.setOnClickListener {
                 Log.d(TAG,"삭제 버튼 클릭 삭제 ID : ${item.id}")
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
-                delListener?.onDelBtnClick(item)
+                delListener?.onClick(item)
 
             }
 
@@ -155,31 +173,13 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun bind() {
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
-
                 Log.d(TAG,"뷰홀더에서 클릭 이벤트!!")
-                addListener?.onAddBtnClick()
-
+                addListener?.onClick()
             }
         }
 
     }
 
-    // 시간:분 형태로 표시
-    private fun HourMin(time:Long) : String {
-        var hour : Long = time / 3600
-        var min : Long = (time % 3600) / 60
-
-        if (hour < 10 && min < 10) {
-            return "0$hour : 0$min"
-        } else if (hour < 10 && min >= 10) {
-            return "0$hour : $min"
-        } else if (hour >= 10 && min < 10) {
-            return "$hour : 0$min"
-        } else {
-            return "$hour : $min"
-        }
-
-    }
 
 
 

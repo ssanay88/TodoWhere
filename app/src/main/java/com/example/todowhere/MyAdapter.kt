@@ -30,6 +30,31 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     val realm = Realm.getDefaultInstance()
 
+    // 인터페이스
+    interface OnAddBtnClickListener {
+        fun onClick()    // 클릭된 순간 로직을 담을 추상 메소드
+    }
+    interface OnDelBtnClickListener {
+        fun onClick(todo: Todo)
+    }
+
+    // 리스너 선언
+    private var addListener : OnAddBtnClickListener? = null
+    private var delListener : OnDelBtnClickListener? = null
+
+
+    // Todo 11.11 지금 여기가 작동 X
+    fun setOnAddBtnClickListener(addlistener:OnAddBtnClickListener) {
+
+        this.addListener = addlistener
+        Log.d(TAG , "setOnAddBtnClickListener 실행")
+    }
+
+    fun setOnDelBtnClickListener(dellistener:OnDelBtnClickListener) {
+        this.delListener = dellistener
+    }
+
+
     // xml을 여러개 사용하려고 할 때
     override fun getItemViewType(position: Int): Int {
 
@@ -70,27 +95,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         }
     }
 
-    // 리스너 선언
-    private var addListener : OnAddBtnClickListener? = null
-    private var delListener : OnDelBtnClickListener? = null
-
-    // 인터페이스
-    interface OnAddBtnClickListener {
-        fun onClick()    // 클릭된 순간 로직을 담을 추상 메소드
-    }
-    interface OnDelBtnClickListener {
-        fun onClick(todo: Todo)
-    }
-
-    // Todo 11.11 지금 여기가 작동 X
-    fun setOnAddBtnClickListener(listener:OnAddBtnClickListener) {
-        Log.d(TAG , "setOnAddBtnClickListener 실행")
-        this.addListener = listener
-    }
-
-    fun setOnDelBtnClickListener(listener:OnDelBtnClickListener) {
-        this.delListener = listener
-    }
 
     // 시간:분 형태로 표시
     private fun HourMin(time:Long) : String {
@@ -173,8 +177,13 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun bind() {
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
-                Log.d(TAG,"뷰홀더에서 클릭 이벤트!!")
-                addListener?.onClick()
+                Log.d(TAG,"일정 추가 버튼 클릭!!")
+                if (addListener == null) {
+                    Log.d(TAG,"addListener이 null 입니다.")
+                } else {
+                    addListener?.onClick()
+                }
+
             }
         }
 

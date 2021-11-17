@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 
-        Log.d(TAG,"MainActivity 시작")
+        Log.d(TAG,"onCreate() 시작")
 
         // 위치 권환 요청
         CheckPermission()
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity() {
             myAdapter.Item = find_Item_Count(selected_date)
 
             // adapter에게 Data가 변했다는 것을 알려줍니다.
-            myAdapter.notifyDataSetChanged()
+            myAdapter?.notifyDataSetChanged()
 
             Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
@@ -239,6 +239,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        Log.d(TAG,"onResume() 시작")
 
         var realmResult =
             realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)

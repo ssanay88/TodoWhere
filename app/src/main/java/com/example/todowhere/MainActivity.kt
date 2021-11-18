@@ -27,6 +27,7 @@ import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import io.realm.Realm
+import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.createObject
 import io.realm.kotlin.where
@@ -61,8 +62,6 @@ class MainActivity : AppCompatActivity() {
     var cur_time = Date().time
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
 
-    // 오늘 날짜에 해당하는 일정들을 담는 리스트
-    // var today_Todo : MutableList<Todo> = getTodayTodo(today_date)
 
     // Geofencing 객체를 만들기 위해 AddTodoActivity에서 불러온 좌표값 , 목표 달성 시간
     var saved_Lat : Double = 0.0
@@ -136,49 +135,11 @@ class MainActivity : AppCompatActivity() {
         mainBinding.TodoRecyclerView.layoutManager = layout
 
 
-        // 캘린더뷰에서 날짜 선택 시 날짜 지정
-        mainBinding.CalendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-
-            // 날짜 선택 시 선택한 시간으로 갱신
-            cur_time = Date().time
-            cur_time_form = SimpleDateFormat("HHmmss").format(cur_time)
-
-            // 날짜 선택시 선택한 날짜로 갱신
-            selected_month = month + 1
-            selected_year = year
-            selected_day = dayOfMonth
-
-            // 선택한 날짜를 yyyyMMdd 형태로 변형
-            selected_date = getDate(selected_year,selected_month,selected_day)
-
-            // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
-            realmResult =
-                realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-            Log.d(TAG,"$realmResult")
-
-            if (realmResult.size == 0 ) {
-                add_blank_data(selected_date)
-            }
-
-            myAdapter.todo_datas = realmResult
-
-            // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
-            myAdapter.Item = find_Item_Count(selected_date)
-
-            // adapter에게 Data가 변했다는 것을 알려줍니다.
-            myAdapter?.notifyDataSetChanged()
-
-            Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
-            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
-            Log.d(TAG, "DB : $realmResult")
-        }
-
-
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
         myAdapter.setOnAddBtnClickListener(object : MyAdapter.OnAddBtnClickListener {
 
             // onBtnClick 오버라이드 정의
-            override fun onClick() {
+            override fun onAddClick() {
 
                 Log.d(TAG,"일정 추가 버튼 클릭 !!")
 
@@ -198,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         // 리사이클러뷰 아이템 삭제 버튼 클릭 시
         myAdapter.setOnDelBtnClickListener(object : MyAdapter.OnDelBtnClickListener {
 
-            override fun onClick(todo: Todo) {
+            override fun onDelClick(todo: Todo) {
 
                 Log.d(TAG , "일정 삭제 버튼 클릭 !!")
 
@@ -209,6 +170,14 @@ class MainActivity : AppCompatActivity() {
                     .setPositiveButton("삭제",{ _,_ ->
                         // Todo DB에서 해당 일정 삭제
                         deleteFromDB(todo.id)
+
+                        // Adapter에 변화된 realm 값들을 적용시켜줘야한다.
+                        myAdapter.todo_datas =
+                            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+                        myAdapter.Item = find_Item_Count(selected_date)
+
+                        // 단순하게 Adapter의 데이터가 변화했다고 알려주는 메서드
+                        // 변화한 데이터는 직접 다시 갱신시켜줘야 한다.
                         myAdapter.notifyDataSetChanged()
 
                     })
@@ -218,6 +187,45 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+
+        // 캘린더뷰에서 날짜 선택 시 날짜 지정
+        mainBinding.CalendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+
+            // 날짜 선택 시 선택한 시간으로 갱신
+            cur_time = Date().time
+            cur_time_form = SimpleDateFormat("HHmmss").format(cur_time)
+
+            // 날짜 선택시 선택한 날짜로 갱신
+            selected_month = month + 1
+            selected_year = year
+            selected_day = dayOfMonth
+
+            // 선택한 날짜를 yyyyMMdd 형태로 변형
+            selected_date = getDate(selected_year,selected_month,selected_day)
+
+            // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+            realmResult = realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+            Log.d(TAG,"$realmResult")
+
+            if (realmResult.size == 0 ) {
+                add_blank_data(selected_date)
+            }
+
+            myAdapter.todo_datas = realmResult
+
+            // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+            myAdapter.Item = find_Item_Count(selected_date)
+
+            // adapter에게 Data가 변했다는 것을 알려줍니다.
+            myAdapter.notifyDataSetChanged()
+
+            Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
+            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
+            Log.d(TAG, "DB : $realmResult")
+        }
+
+
 
 
         // 활동 기록을 위한 상태 체크
@@ -240,6 +248,8 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         Log.d(TAG,"onResume() 시작")
+        // 이거 없으면 클릭리스너 작동 X - 11.18
+        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
 
         var realmResult =
             realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
@@ -258,18 +268,37 @@ class MainActivity : AppCompatActivity() {
         mainBinding.TodoRecyclerView.layoutManager = layout
         myAdapter.todo_datas = realmResult
 
-
         // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
         myAdapter.Item = find_Item_Count(selected_date)
 
         // adapter에게 Data가 변했다는 것을 알려줍니다.
         myAdapter.notifyDataSetChanged()
 
+
+
+
+
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
         // ID는 realm DB에 들어가는 id와 동일하게 적용
         geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
         addGeofences()    // geofencing 추가
+
+    }
+
+    fun returnUpdatedRealm() {
+
+        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+
+        var realmResult =
+            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+
+        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        mainBinding.TodoRecyclerView.adapter = myAdapter
+
+        myAdapter.todo_datas = realmResult
+        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+        myAdapter.Item = find_Item_Count(selected_date)
 
     }
 

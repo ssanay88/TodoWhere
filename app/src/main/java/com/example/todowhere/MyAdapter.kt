@@ -32,10 +32,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     // 인터페이스
     interface OnAddBtnClickListener {
-        fun onClick()    // 클릭된 순간 로직을 담을 추상 메소드
+        fun onAddClick()    // 클릭된 순간 로직을 담을 추상 메소드
     }
     interface OnDelBtnClickListener {
-        fun onClick(todo: Todo)
+        fun onDelClick(todo: Todo)
     }
 
     // 리스너 선언
@@ -44,14 +44,14 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
 
     // Todo 11.11 지금 여기가 작동 X
-    fun setOnAddBtnClickListener(addlistener:OnAddBtnClickListener) {
+    fun setOnAddBtnClickListener(addlistener: OnAddBtnClickListener) {
 
-        this.addListener = addlistener
+        addListener = addlistener
         Log.d(TAG , "setOnAddBtnClickListener 실행")
     }
 
-    fun setOnDelBtnClickListener(dellistener:OnDelBtnClickListener) {
-        this.delListener = dellistener
+    fun setOnDelBtnClickListener(dellistener: OnDelBtnClickListener) {
+        delListener = dellistener
     }
 
 
@@ -71,12 +71,13 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 일정이 없는 경우 일정 추가 버튼만 출력
             0 -> {
                 view = LayoutInflater.from(context).inflate(R.layout.add_todo, parent, false)
-                MyViewHolder_Add(view)
+                MyViewHolderAdd(view)
             }
+
             // 일정을 정리하여 보여주는 뷰홀더
             else -> {
                 view = LayoutInflater.from(context).inflate(R.layout.todo_list, parent, false)
-                MyViewHolder_Update(view)
+                MyViewHolderUpdate(view)
             }
 
         }
@@ -87,10 +88,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
    override fun onBindViewHolder(holder: RecyclerView.ViewHolder , position: Int) {
         when(todo_datas[position].view_type) {
             0 -> {
-                (holder as MyViewHolder_Add).bind()
+                (holder as MyViewHolderAdd).bind()
             }
             else -> {
-                (holder as MyViewHolder_Update).bind(todo_datas[position])
+                (holder as MyViewHolderUpdate).bind(todo_datas[position])
             }
         }
     }
@@ -120,7 +121,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     }
 
     // 뷰 홀더 클래스 - 등록된 일정을 보여줄 뷰 홀더
-    inner class MyViewHolder_Update(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolderUpdate(view: View) : RecyclerView.ViewHolder(view) {
 
         val TAG : String = "로그"
 
@@ -149,7 +150,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             delBtn.setOnClickListener {
                 Log.d(TAG,"삭제 버튼 클릭 삭제 ID : ${item.id}")
                 // 삭제 과정 확인 다이어로그 Yes -> 해당 목표 DB에서 삭제 및 아이템 재정리
-                delListener?.onClick(item)
+                delListener?.onDelClick(item)
 
             }
 
@@ -164,7 +165,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     }
 
     // 뷰 홀더 클래스 - 일정 추가하고 싶을 경우 사용하는 뷰홀더
-    inner class MyViewHolder_Add(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolderAdd(view: View) : RecyclerView.ViewHolder(view) {
 
         val TAG: String = "로그"
 
@@ -181,7 +182,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                 if (addListener == null) {
                     Log.d(TAG,"addListener이 null 입니다.")
                 } else {
-                    addListener?.onClick()
+                    addListener?.onAddClick()
                 }
 
             }

@@ -43,7 +43,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     private var delListener : OnDelBtnClickListener? = null
 
 
-    // Todo 11.11 지금 여기가 작동 X
     fun setOnAddBtnClickListener(addlistener: OnAddBtnClickListener) {
 
         addListener = addlistener

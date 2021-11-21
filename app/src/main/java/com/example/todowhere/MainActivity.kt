@@ -286,21 +286,21 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun returnUpdatedRealm() {
-
-        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
-
-        var realmResult =
-            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
-        mainBinding.TodoRecyclerView.adapter = myAdapter
-
-        myAdapter.todo_datas = realmResult
-        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
-        myAdapter.Item = find_Item_Count(selected_date)
-
-    }
+//    fun returnUpdatedRealm() {
+//
+//        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+//
+//        var realmResult =
+//            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+//
+//        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+//        mainBinding.TodoRecyclerView.adapter = myAdapter
+//
+//        myAdapter.todo_datas = realmResult
+//        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+//        myAdapter.Item = find_Item_Count(selected_date)
+//
+//    }
 
 
     // 날짜를 원하는 8자리로 만들어주는 함수

@@ -95,26 +95,30 @@
         app:layout_constraintTop_toBottomOf="@+id/mapView"
         app:layout_constraintVertical_bias="0.254">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/AddButton"
             android:layout_width="90dp"
             android:layout_height="45dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="16dp"
             android:text="@string/add"
+            android:textStyle="bold"
+            android:background="@drawable/add_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/CancelButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/CancelButton"
             android:layout_width="90dp"
             android:layout_height="45dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="32dp"
             android:text="@string/cancel"
+            android:textStyle="bold"
+            android:background="@drawable/delete_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/AddButton"

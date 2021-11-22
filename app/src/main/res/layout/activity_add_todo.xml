@@ -16,27 +16,28 @@
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/whatTodo"
-        >
+        app:layout_constraintTop_toBottomOf="@+id/whatTodo">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/TimeButton"
             android:layout_width="170dp"
             android:layout_height="55dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/button_layout"
             android:text="@string/time"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/MapButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/MapButton"
             android:layout_width="170dp"
             android:layout_height="55dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="32dp"
+            android:background="@drawable/button_layout"
             android:text="@string/map"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -46,6 +47,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/whatTodo"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -56,8 +58,7 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/whatTodoText"
@@ -80,8 +81,7 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
@@ -101,14 +101,13 @@
             android:layout_height="45dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/add_button"
             android:text="@string/add"
             android:textStyle="bold"
-            android:background="@drawable/add_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/CancelButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/CancelButton"
@@ -116,9 +115,9 @@
             android:layout_height="45dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="32dp"
+            android:background="@drawable/delete_button"
             android:text="@string/cancel"
             android:textStyle="bold"
-            android:background="@drawable/delete_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/AddButton"

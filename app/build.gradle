@@ -54,6 +54,8 @@ dependencies {
 
     // anko 라이브러리
     implementation "org.jetbrains.anko:anko:$anko_version"
+    // 머터리얼 캘린더 뷰
+    implementation 'com.prolificinteractive:material-calendarview:1.4.3'
     // 리사이클러뷰
     implementation 'androidx.recyclerview:recyclerview:1.2.0'
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0"

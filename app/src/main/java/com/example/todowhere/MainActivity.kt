@@ -190,16 +190,16 @@ class MainActivity : AppCompatActivity() {
 
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
-        mainBinding.CalendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+        mainBinding.CalendarView.setOnDateChangedListener { widget, date, selected ->   //{ view, year, month, dayOfMonth ->
 
             // 날짜 선택 시 선택한 시간으로 갱신
             cur_time = Date().time
             cur_time_form = SimpleDateFormat("HHmmss").format(cur_time)
 
             // 날짜 선택시 선택한 날짜로 갱신
-            selected_month = month + 1
-            selected_year = year
-            selected_day = dayOfMonth
+            selected_month = date.month + 1
+            selected_year = date.year
+            selected_day = date.day
 
             // 선택한 날짜를 yyyyMMdd 형태로 변형
             selected_date = getDate(selected_year,selected_month,selected_day)
@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
             // adapter에게 Data가 변했다는 것을 알려줍니다.
             myAdapter.notifyDataSetChanged()
 
-            Log.d(TAG, "선택한 날짜는 $year - ${month + 1} - $dayOfMonth 입니다.")
+            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
             Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
             Log.d(TAG, "DB : $realmResult")
         }

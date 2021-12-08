@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@drawable/list_background"
+    android:elevation="4dp"
+    android:layout_margin="2dp"
     android:layout_height="100dp">
 
 
@@ -18,7 +21,8 @@
         <TextView
             android:id="@+id/todoText"
             android:layout_width="0dp"
-
+            android:gravity="center"
+            android:textSize="18dp"
             android:layout_height="0dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
@@ -39,6 +43,7 @@
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="8dp"
             android:text="@string/done"
+            android:elevation="18dp"
             app:backgroundTint="@color/sky_200"
             app:iconTint="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -59,8 +64,9 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
-        android:background="@color/sky_200"
+        android:background="@drawable/map_button"
         android:contentDescription="@string/location"
+        android:elevation="18dp"
         android:tint="@color/sky_700"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/delete_button"
@@ -77,8 +83,9 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
+        android:elevation="18dp"
         android:layout_marginBottom="8dp"
-        android:background="#FFAB91"
+        android:background="@drawable/delete_list_button"
         android:contentDescription="@string/menu"
         android:tint="#FF5722"
         app:layout_constraintBottom_toBottomOf="parent"

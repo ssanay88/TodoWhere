@@ -4,6 +4,7 @@
     <color name="dark_green_500">#009688</color>
     <color name="dark_green_700">#00796B</color>
     <color name="sky_200">#90CAF9</color>
+    <color name="sky_500">#2196F3</color>
     <color name="sky_700">#1976D2</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

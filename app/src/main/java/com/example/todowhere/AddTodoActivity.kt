@@ -27,6 +27,8 @@ import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import org.jetbrains.anko.toast
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,6 +41,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var addTodoBinding: ActivityAddTodoBinding
 
     private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
+    private lateinit var reverseGeocodingService: ReverseGeocodingService    // reverse geocoding 서비스
 
     val realm = Realm.getDefaultInstance()  // 인스턴스 얻기
 
@@ -66,6 +69,13 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // MainActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_mainactivity = getIntent()
 
+        // retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://naveropenapi.apigw.ntruss.com")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        reverseGeocodingService = retrofit.create(ReverseGeocodingService::class.java)
 
 
         // 전달 받은 날짜와 시간 저장
@@ -138,6 +148,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             if ( selected_Lng != 0.0 && selected_Lat != 0.0) {
                 // 주소로 변경 - 네이버 reverse geocoding API 사용
                 Log.d(TAG,"좌표값 입력 Lng : $selected_Lng , Lat : $selected_Lat")
+                reverseGeocodingService.getGeocoding("$selected_Lng" + "," + "$selected_Lat")
             }
             else {
                 Toast.makeText(this, "지도에서 목적지를 선택하여 주십시오", Toast.LENGTH_SHORT).show()

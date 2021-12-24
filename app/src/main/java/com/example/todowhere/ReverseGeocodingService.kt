@@ -9,6 +9,8 @@ interface ReverseGeocodingService {
     // https://naveropenapi.apigw.ntruss.com : 기본 URL
     @GET("/map-reversegeocode/v2/gc?output=json&request=coordsToaddr")
     fun getGeocoding(
+        @Query("X-NCP-APIGW-API-KEY-ID") apiKeyID:String,
+        @Query("X-NCP-APIGW-API-KEY") apiKey:String,
         @Query("coords") coords:String
     )
 

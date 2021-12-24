@@ -148,7 +148,12 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             if ( selected_Lng != 0.0 && selected_Lat != 0.0) {
                 // 주소로 변경 - 네이버 reverse geocoding API 사용
                 Log.d(TAG,"좌표값 입력 Lng : $selected_Lng , Lat : $selected_Lat")
-                reverseGeocodingService.getGeocoding("$selected_Lng" + "," + "$selected_Lat")
+
+                reverseGeocodingService.getGeocoding(
+                    "qc5x10r84y",
+                    "TR6JpY6peYYFQLKSBpgYvYWAt2M190SH9otqt8UI",
+                    "$selected_Lng" + "," + "$selected_Lat")
+
             }
             else {
                 Toast.makeText(this, "지도에서 목적지를 선택하여 주십시오", Toast.LENGTH_SHORT).show()

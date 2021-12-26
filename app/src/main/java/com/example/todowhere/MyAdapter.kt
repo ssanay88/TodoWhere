@@ -1,11 +1,6 @@
 package com.example.todowhere
 
-import android.app.AlertDialog
-import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.content.Context
-import android.content.Intent
-import android.icu.util.Calendar
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,14 +8,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.todowhere.databinding.AddTodoBinding
-import com.example.todowhere.databinding.TodoListBinding
+import com.example.todowhere.data.Todo
 import io.realm.Realm
-import io.realm.kotlin.where
-import org.w3c.dom.Text
 
 // 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
 class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -133,7 +123,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             Log.d(TAG,"MyViewHolder_Update called!!")
         }
 
-        fun bind(item:Todo) {
+        fun bind(item: Todo) {
             // Realm 에서 데이터 불러와서 적용
 
             todoTextView.text = item.what

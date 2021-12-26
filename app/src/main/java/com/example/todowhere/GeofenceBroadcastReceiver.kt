@@ -3,17 +3,14 @@ package com.example.todowhere
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.CountDownTimer
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import com.example.todowhere.data.Todo
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import io.realm.Realm
-import io.realm.Sort
 import io.realm.kotlin.where
 import java.util.*
-import kotlin.concurrent.timer
 
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
 class GeofenceBroadcastReceiver : BroadcastReceiver() {

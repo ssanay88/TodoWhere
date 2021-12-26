@@ -1,4 +1,4 @@
-package com.example.todowhere
+package com.example.todowhere.data
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

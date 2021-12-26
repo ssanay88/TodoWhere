@@ -1,6 +1,8 @@
 package com.example.todowhere
 
+import com.example.todowhere.DTO.GetAllDto
 import com.naver.maps.geometry.LatLng
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -12,6 +14,6 @@ interface ReverseGeocodingService {
         @Query("X-NCP-APIGW-API-KEY-ID") apiKeyID:String,
         @Query("X-NCP-APIGW-API-KEY") apiKey:String,
         @Query("coords") coords:String
-    )
+    ): Call<GetAllDto>
 
 }

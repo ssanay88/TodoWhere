@@ -1,23 +1,15 @@
 package com.example.todowhere
 
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color.GREEN
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
+import com.example.todowhere.data.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
-import com.google.android.gms.location.Geofence
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.geometry.LatLngBounds
-import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
@@ -26,13 +18,10 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
-import org.jetbrains.anko.toast
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.math.min
 
 class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 

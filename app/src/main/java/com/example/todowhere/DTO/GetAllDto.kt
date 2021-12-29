@@ -1,14 +1,14 @@
 package com.example.todowhere.DTO
 
 
-data class GetAllDto(var result:Result? = null) {
-    data class Result(var region:Region? = null) {
+data class GetAllDto(var result:Result) {
+    data class Result(var region:Region) {
         data class Region(
-            var area1:Area? = null,
-            var area2:Area? = null,
-            var area3:Area? = null
+            var area1:Area,
+            var area2:Area,
+            var area3:Area
         ) {
-            data class Area(var name:String? = null)
+            data class Area(var name:String)
         }
     }
 }

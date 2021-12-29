@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.example.todowhere.DTO.GetAllDto
 import com.example.todowhere.data.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
@@ -18,6 +19,9 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
@@ -142,6 +146,29 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                     "qc5x10r84y",
                     "TR6JpY6peYYFQLKSBpgYvYWAt2M190SH9otqt8UI",
                     "$selected_Lng" + "," + "$selected_Lat")
+                    .enqueue(object : Callback<GetAllDto> {
+
+                        override fun onResponse(
+                            call: Call<GetAllDto>,
+                            response: Response<GetAllDto>
+                        ) {
+                            if (response.isSuccessful.not()) {
+                                Log.e(TAG,"응답에 실패했습니다.")
+                                return
+                            }
+
+                            response.body().let {
+
+                                Log.d(TAG,"${it?.result?.region?.area1} , ${it?.result?.region?.area2} ,${it?.result?.region?.area3}")
+                            }
+
+                        }
+
+                        override fun onFailure(call: Call<GetAllDto>, t: Throwable) {
+                            Log.e(TAG,t.toString())
+                        }
+
+                    })
                 // TODO 받아온 데이터 처리
 
             }

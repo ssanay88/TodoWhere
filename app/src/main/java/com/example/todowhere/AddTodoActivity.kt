@@ -145,7 +145,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                 reverseGeocodingService.getGeocoding(
                     "qc5x10r84y",
                     "TR6JpY6peYYFQLKSBpgYvYWAt2M190SH9otqt8UI",
-                    "$selected_Lng" + "," + "$selected_Lat")
+                    "$selected_Lng,$selected_Lat")
                     .enqueue(object : Callback<GetAllDto> {
 
                         override fun onResponse(
@@ -159,7 +159,13 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             response.body().let {
                                 // TODO 응답은 했지만 NULL 출력
-                                Log.d(TAG,"${it?.result?.region?.area1} , ${it?.result?.region?.area2} ,${it?.result?.region?.area3}")
+                                Log.d(TAG,"${it?.status?.code} , ${it?.status?.name}")
+                                it?.results?.forEach {
+                                    Log.d(TAG,it.name)
+                                    Log.d(TAG,"${it.region.area1.name} , ${it.region.area2.name} , ${it.region.area3.name}")
+                                }
+
+//                                Log.d(TAG,"${it?.result?.results.region?.area1?.name} , ${it?.result?.region?.area2?.name} ,${it?.result?.region?.area3?.name}")
                             }
 
                         }

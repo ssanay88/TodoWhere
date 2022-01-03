@@ -143,8 +143,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                 Log.d(TAG,"좌표값 입력 Lng : $selected_Lng , Lat : $selected_Lat")
 
                 reverseGeocodingService.getGeocoding(
-                    "qc5x10r84y",
-                    "TR6JpY6peYYFQLKSBpgYvYWAt2M190SH9otqt8UI",
+                    BuildConfig.REVESEGEOCODING_API_KEY_ID,
+                    BuildConfig.REVESEGEOCODING_API_KEY,
                     "$selected_Lng,$selected_Lat")
                     .enqueue(object : Callback<GetAllDto> {
 

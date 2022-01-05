@@ -1,4 +1,4 @@
-package com.example.todowhere
+package com.example.todowhere.Activity
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -15,6 +15,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.todowhere.GeofenceBroadcastReceiver
+import com.example.todowhere.MyAdapter
+import com.example.todowhere.R
+import com.example.todowhere.ResetWorker
 import com.example.todowhere.data.Todo
 import com.example.todowhere.databinding.ActivityMainBinding
 import com.google.android.gms.location.Geofence
@@ -127,6 +131,7 @@ class MainActivity : AppCompatActivity() {
         mainBinding.TodoRecyclerView.layoutManager = layout
 
 
+
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
         myAdapter.setOnAddBtnClickListener(object : MyAdapter.OnAddBtnClickListener {
 
@@ -178,6 +183,13 @@ class MainActivity : AppCompatActivity() {
                     }).show()
             }
 
+        })
+
+        myAdapter.setOnMapBtnClickListener(object : MyAdapter.OnMapBtnClickListener {
+            override fun onMapClick() {
+                Log.d(TAG,"맵 버튼 클릭")
+                // TODO 위치를 띄우는 팝업 구현
+            }
         })
 
 

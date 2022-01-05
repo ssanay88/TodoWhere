@@ -30,10 +30,10 @@
             android:value="qc5x10r84y" />
 
         <activity
-            android:name=".AddTodoActivity"
-            android:parentActivityName=".MainActivity" >
+            android:name=".Activity.AddTodoActivity"
+            android:parentActivityName=".Activity.MainActivity" >
         </activity>
-        <activity android:name=".MainActivity" >
+        <activity android:name=".Activity.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

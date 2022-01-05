@@ -27,10 +27,14 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     interface OnDelBtnClickListener {
         fun onDelClick(todo: Todo)
     }
+    interface OnMapBtnClickListener {
+        fun onMapClick()
+    }
 
     // 리스너 선언
     private var addListener : OnAddBtnClickListener? = null
     private var delListener : OnDelBtnClickListener? = null
+    private var mapListener : OnMapBtnClickListener? = null
 
 
     fun setOnAddBtnClickListener(addlistener: OnAddBtnClickListener) {
@@ -41,6 +45,10 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
     fun setOnDelBtnClickListener(dellistener: OnDelBtnClickListener) {
         delListener = dellistener
+    }
+
+    fun setOnMapBtnClickListener(maplistener: OnMapBtnClickListener) {
+        mapListener = maplistener
     }
 
 
@@ -131,9 +139,8 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
 
             mapBtn.setOnClickListener {
-                Log.d(TAG,"지도 버튼 클릭")
                 // 지도 다이어로그 띄우기
-                initMapBtnClicked()
+                mapListener?.onMapClick()
             }
 
             delBtn.setOnClickListener {
@@ -144,12 +151,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             }
 
         }
-
-        // 지도 버튼을 클릭 했을을 경우 발생 이벤트
-        fun initMapBtnClicked() {
-
-        }
-
 
     }
 

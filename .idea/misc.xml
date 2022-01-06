@@ -4,10 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/drawable/address_textview.xml" value="0.275" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/drawable/delete_button.xml" value="0.275" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.275" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.275" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/drawable/ic_outline_cancel_24.xml" value="0.275" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/activity_add_todo.xml" value="0.2" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/add_todo.xml" value="0.1585144927536232" />
-        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/map_popup.xml" value="0.25885416666666666" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/map_popup.xml" value="0.1" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/todo_list.xml" value="0.4" />
         <entry key="..\:/Users/ppllo/StudioProjects/TodoWhere/app/src/main/res/drawable/add_button.xml" value="0.290625" />
         <entry key="..\:/Users/ppllo/StudioProjects/TodoWhere/app/src/main/res/drawable/button_layout.xml" value="0.1" />

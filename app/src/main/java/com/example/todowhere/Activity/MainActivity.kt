@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
@@ -189,6 +191,16 @@ class MainActivity : AppCompatActivity() {
             override fun onMapClick() {
                 Log.d(TAG,"맵 버튼 클릭")
                 // TODO 위치를 띄우는 팝업 구현
+                val mapDialogView = LayoutInflater.from(this@MainActivity).inflate(R.layout.map_popup,null)
+                val mapBuilder = AlertDialog.Builder(this@MainActivity)
+                    .setView(mapDialogView)
+
+                mapBuilder.show()
+
+                val backBtn = mapDialogView.findViewById<ImageButton>(R.id.backBtn)
+                backBtn.setOnClickListener {
+                    finish()
+                }
 
             }
         })

@@ -7,6 +7,7 @@
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/activity_add_todo.xml" value="0.2" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/add_todo.xml" value="0.1585144927536232" />
+        <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/map_popup.xml" value="0.25885416666666666" />
         <entry key="..\:/Users/ppllo/AndroidStudioProjects/TodoWhere/app/src/main/res/layout/todo_list.xml" value="0.4" />
         <entry key="..\:/Users/ppllo/StudioProjects/TodoWhere/app/src/main/res/drawable/add_button.xml" value="0.290625" />
         <entry key="..\:/Users/ppllo/StudioProjects/TodoWhere/app/src/main/res/drawable/button_layout.xml" value="0.1" />
@@ -18,9 +19,6 @@
         <entry key="..\:/Users/ppllo/StudioProjects/TodoWhere/app/src/main/res/layout/add_todo.xml" value="0.1334853090172239" />
       </map>
     </option>
-  </component>
-  <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/todowhere/data/Area.kt" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

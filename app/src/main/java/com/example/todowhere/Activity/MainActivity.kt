@@ -189,6 +189,7 @@ class MainActivity : AppCompatActivity() {
             override fun onMapClick() {
                 Log.d(TAG,"맵 버튼 클릭")
                 // TODO 위치를 띄우는 팝업 구현
+
             }
         })
 

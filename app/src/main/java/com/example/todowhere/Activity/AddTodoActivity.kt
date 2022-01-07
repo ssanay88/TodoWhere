@@ -84,7 +84,6 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = fm.findFragmentById(R.id.mapView) as MapFragment?
             ?: MapFragment.newInstance().also {
                 fm.beginTransaction().add(R.id.mapView, it).commit()
-
             }
 
         // OnMapReadyCallBack을 상속받은 뒤 this 사용

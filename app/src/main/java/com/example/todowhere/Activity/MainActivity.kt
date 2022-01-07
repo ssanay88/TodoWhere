@@ -27,6 +27,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
+import com.naver.maps.map.MapFragment
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.createObject
@@ -132,6 +133,13 @@ class MainActivity : AppCompatActivity() {
         val layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
+        // popupFragment에 지도뷰 추가
+//        val fm = supportFragmentManager
+//        val mapFragment = fm.findFragmentById(R.id.MapPopUpView) as MapFragment?
+//            ?: MapFragment.newInstance().also {
+//                fm.beginTransaction().add(R.id.MapPopUpView, it).commit()
+//            }
+
 
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
@@ -194,12 +202,13 @@ class MainActivity : AppCompatActivity() {
                 val mapDialogView = LayoutInflater.from(this@MainActivity).inflate(R.layout.map_popup,null)
                 val mapBuilder = AlertDialog.Builder(this@MainActivity)
                     .setView(mapDialogView)
+                    .create()
 
                 mapBuilder.show()
 
                 val backBtn = mapDialogView.findViewById<ImageButton>(R.id.backBtn)
                 backBtn.setOnClickListener {
-                    finish()
+                    mapBuilder.cancel()
                 }
 
             }

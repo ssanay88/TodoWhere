@@ -208,7 +208,7 @@ class MainActivity : AppCompatActivity() {
 
                 val backBtn = mapDialogView.findViewById<ImageButton>(R.id.backBtn)
                 backBtn.setOnClickListener {
-                    mapBuilder.cancel()
+                    mapBuilder.dismiss()
                 }
 
             }

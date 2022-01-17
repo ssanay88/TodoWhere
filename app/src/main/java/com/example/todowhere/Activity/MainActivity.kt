@@ -2,8 +2,10 @@ package com.example.todowhere.Activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -17,10 +19,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.todowhere.GeofenceBroadcastReceiver
-import com.example.todowhere.MyAdapter
-import com.example.todowhere.R
-import com.example.todowhere.ResetWorker
+import com.example.todowhere.*
 import com.example.todowhere.data.Todo
 import com.example.todowhere.databinding.ActivityMainBinding
 import com.google.android.gms.location.Geofence
@@ -199,21 +198,25 @@ class MainActivity : AppCompatActivity() {
             override fun onMapClick() {
                 Log.d(TAG,"맵 버튼 클릭")
                 // TODO 위치를 띄우는 팝업 구현
-                val mapDialogView = LayoutInflater.from(this@MainActivity).inflate(R.layout.map_popup,null)
-                val mapBuilder = AlertDialog.Builder(this@MainActivity)
-                    .setView(mapDialogView)
-                    .create()
-
-                mapBuilder.show()
-
-                val backBtn = mapDialogView.findViewById<ImageButton>(R.id.backBtn)
-                backBtn.setOnClickListener {
-                    mapBuilder.dismiss()
-                }
+                val dialog = MapDialog()
+                dialog.show(supportFragmentManager, "MapDialog")
+//                val mapDialogView = LayoutInflater.from(this@MainActivity).inflate(R.layout.map_popup,null)
+//                val mapBuilder = AlertDialog.Builder(this@MainActivity)
+//                    .setView(mapDialogView)
+//                    // .create()
+//
+//                val mAlertDialog = mapBuilder.show()
+//
+//                val backBtn = mapDialogView.findViewById<ImageButton>(R.id.backBtn)
+//                backBtn.setOnClickListener {
+//                    mAlertDialog.dismiss()
+//                }
 
             }
         })
 
+        mainBinding.CalendarView.setCurrentDate(Date(System.currentTimeMillis()))    // 오늘 날짜로 설정
+        mainBinding.CalendarView.setDateSelected(Date(System.currentTimeMillis()),true)    // 오늘 날짜 선택
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
         mainBinding.CalendarView.setOnDateChangedListener { widget, date, selected ->   //{ view, year, month, dayOfMonth ->
@@ -376,6 +379,7 @@ class MainActivity : AppCompatActivity() {
     // 권한 확인
     fun CheckPermission() {
 
+        // ACCESS_FINE_LOCATION 허용 시 ACCESS_COARSE_LOCATION 권한도 허용, 반대는 X
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED){
             // 권한이 거부했을 경우
             Log.d(TAG,"FINE_LOCATION 접근 권한 불허")
@@ -430,10 +434,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             FINE_BACKGROUND_REQUEST_CODE -> {
-//                if (grantResults.isEmpty()) {
-//                    Log.d(TAG,"권한 결과가 비었음1")
-//                    throw RuntimeException("Empty permission result")
-//                }
 
                 if (grantResults.size != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // 권한이 허용된 경우
@@ -447,7 +447,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         // 권한을 처음 보거나 다시 묻지 않음을 선택하거나 권한을 허용한 경우 false 리턴
                         Log.d(TAG,"사용자가 권한 허용")
-                        // 세팅으로 가서 무조건 허용하도록 작성성
+                        // 세팅으로 가서 무조건 허용하도록 작성
                     }
                 }
             }
@@ -458,7 +458,7 @@ class MainActivity : AppCompatActivity() {
     private fun GetPermission() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("권한 필수 요청")
-            .setMessage("위치 서비스를 이용하기 위해 권한이 반드시 허용되어야 합니다.")
+            .setMessage("백그라운드 위치 서비스를 이용하기 위해 권한이 반드시 허용되어야 합니다.")
 
         builder.setPositiveButton("OK") { dialogInterface, i ->
             val intent = Intent(
@@ -467,6 +467,7 @@ class MainActivity : AppCompatActivity() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)   // 6
         }
+
         builder.setNegativeButton("Later") { dialogInterface, i ->
             // ignore
         }

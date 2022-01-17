@@ -60,6 +60,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:hint="@string/add_todo"
+        app:boxStrokeColor="@color/sky_500"
+        app:hintTextColor="@color/sky_500"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

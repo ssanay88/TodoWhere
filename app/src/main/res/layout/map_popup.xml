@@ -6,16 +6,13 @@
     android:layout_margin="20dp"
     android:layout_height="match_parent">
 
-    <fragment
+
+    <com.naver.maps.map.MapView
         android:id="@+id/MapPopUpView"
-        android:name="com.naver.maps.map.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </fragment>
-
-
-
+    </com.naver.maps.map.MapView>
 
     <ImageButton
         android:id="@+id/backBtn"

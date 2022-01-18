@@ -194,6 +194,7 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+        // Map버튼 클릭 시
         myAdapter.setOnMapBtnClickListener(object : MyAdapter.OnMapBtnClickListener {
             override fun onMapClick() {
                 Log.d(TAG,"맵 버튼 클릭")

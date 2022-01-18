@@ -22,10 +22,6 @@
         android:theme="@style/Theme.TodoWhere"
         android:usesCleartextTraffic="true"
         tools:replace="android:appComponentFactory">
-        <activity
-            android:name=".Activity.MapPopUpActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.Dialog" />
 
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"

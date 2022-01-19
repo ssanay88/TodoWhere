@@ -28,7 +28,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun onDelClick(todo: Todo)
     }
     interface OnMapBtnClickListener {
-        fun onMapClick()
+        fun onMapClick(todo: Todo)
     }
 
     // 리스너 선언
@@ -140,7 +140,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
             mapBtn.setOnClickListener {
                 // 지도 다이어로그 띄우기
-                mapListener?.onMapClick()
+                mapListener?.onMapClick(item)
             }
 
             delBtn.setOnClickListener {

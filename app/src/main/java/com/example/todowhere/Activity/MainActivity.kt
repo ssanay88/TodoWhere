@@ -196,10 +196,10 @@ class MainActivity : AppCompatActivity() {
 
         // Map버튼 클릭 시
         myAdapter.setOnMapBtnClickListener(object : MyAdapter.OnMapBtnClickListener {
-            override fun onMapClick() {
+            override fun onMapClick(todo:Todo) {
                 Log.d(TAG,"맵 버튼 클릭")
                 // TODO 위치를 띄우는 팝업 구현
-                val dialog = MapDialog()
+                val dialog = MapDialog(todo)
                 dialog.show(supportFragmentManager, "MapDialog")
 //                val mapDialogView = LayoutInflater.from(this@MainActivity).inflate(R.layout.map_popup,null)
 //                val mapBuilder = AlertDialog.Builder(this@MainActivity)

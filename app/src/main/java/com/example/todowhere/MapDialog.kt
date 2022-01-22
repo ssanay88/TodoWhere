@@ -12,9 +12,7 @@ import com.example.todowhere.data.Todo
 
 import com.example.todowhere.databinding.MapPopupBinding
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.MapView
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.*
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import retrofit2.Call
@@ -25,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
 
-    private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
+
     private lateinit var mapView: MapView
     private lateinit var reverseGeocodingService: ReverseGeocodingService    // reverse geocoding 서비스
 
@@ -37,14 +35,15 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
 
         binding = MapPopupBinding.inflate(inflater,container,false)
         val view = MapBinding.root
-//
-//        val fm = supportFragmentManager
-//        val mapFragment = fm.findFragmentById(R.id.map) as MapFragment?
-//            ?: MapFragment.newInstance().also {
-//                fm.beginTransaction().add(R.id.map, it).commit()
-//            }
-//
-//        mapFragment.getMapAsync(this)
+
+        // MapFragment를 다른 프래그먼트 내에 배치할 경우 childFragmentManager를 사용해 둔다
+        val fm = childFragmentManager
+        val mapFragment = fm.findFragmentById(R.id.MapPopUpView) as MapFragment?
+            ?: MapFragment.newInstance().also {
+                fm.beginTransaction().add(R.id.MapPopUpView, it).commit()
+            }
+
+        mapFragment.getMapAsync(this)
 
 
         // retrofit
@@ -57,7 +56,7 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
         reverseGeocodingService = retrofit.create(ReverseGeocodingService::class.java)
 
         // 지도에 마커 표시
-        markOnMap(todo)
+
 
         // 주소 표시
         getAddress(todo)
@@ -85,11 +84,6 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
         mapView.onDestroy()
     }
 
-    private fun markOnMap(todo:Todo) {
-        val marker = Marker()
-        marker.position = LatLng(todo.center_lat,todo.center_lng)
-        marker.map = naverMap
-    }
 
     private fun getAddress(todo: Todo) {
 
@@ -109,6 +103,7 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
                     response: Response<GetAllDto>
                 ) {
                     if (response.isSuccessful.not()) {
+                        Log.e(TAG,"여기서 실패")
                         Log.e(TAG,"응답에 실패했습니다.")
                         return
                     }
@@ -135,6 +130,18 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
                 }
 
             })
+
+
+    }
+
+    override fun onMapReady(naverMap: NaverMap) {
+
+        val marker = Marker()
+        marker.position = LatLng(todo.center_lat,todo.center_lng)
+        marker.map = naverMap
+
+        val cameraUpdate = CameraUpdate.scrollTo(LatLng(todo.center_lat, todo.center_lng))
+        naverMap.moveCamera(cameraUpdate)
 
 
     }
@@ -170,6 +177,8 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
         super.onLowMemory()
         mapView.onLowMemory()
     }
+
+
 
 //    override fun onMapReady(p0: NaverMap) {
 //        TODO("Not yet implemented")

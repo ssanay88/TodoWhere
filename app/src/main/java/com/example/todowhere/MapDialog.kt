@@ -55,8 +55,6 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
         // reverseGeocoding 서비스 생성
         reverseGeocodingService = retrofit.create(ReverseGeocodingService::class.java)
 
-        // 지도에 마커 표시
-
 
         // 주소 표시
         getAddress(todo)
@@ -87,15 +85,12 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
 
     private fun getAddress(todo: Todo) {
 
-        val lat = todo.center_lat.toString()
-        val lng = todo.center_lng.toString()
-
-
+        Log.d(TAG,"${todo.center_lat},${todo.center_lng}")
 
         reverseGeocodingService.getGeocoding(
             BuildConfig.REVESEGEOCODING_API_KEY_ID,
             BuildConfig.REVESEGEOCODING_API_KEY,
-            "$lat,$lng")
+            "${todo.center_lng},${todo.center_lat}")
             .enqueue(object : Callback<GetAllDto> {
 
                 override fun onResponse(
@@ -103,8 +98,9 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
                     response: Response<GetAllDto>
                 ) {
                     if (response.isSuccessful.not()) {
-                        Log.e(TAG,"여기서 실패")
-                        Log.e(TAG,"응답에 실패했습니다.")
+                        Log.e(TAG,"${response.message()}")
+                        Log.e(TAG,"여기서 실패 ${response.body()?.status?.code} ${response.body()?.status?.name}")
+
                         return
                     }
 
@@ -120,7 +116,6 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
 
                         }
 
-//                                Log.d(TAG,"${it?.result?.results.region?.area1?.name} , ${it?.result?.region?.area2?.name} ,${it?.result?.region?.area3?.name}")
                     }
 
                 }
@@ -134,15 +129,26 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
 
     }
 
+    // Map객체가 열리면 마커를 찍고 카메라 이동
     override fun onMapReady(naverMap: NaverMap) {
 
+        // 마커 생성
         val marker = Marker()
         marker.position = LatLng(todo.center_lat,todo.center_lng)
         marker.map = naverMap
 
+        // 마커 중심으로 카메라 이동
         val cameraUpdate = CameraUpdate.scrollTo(LatLng(todo.center_lat, todo.center_lng))
         naverMap.moveCamera(cameraUpdate)
 
+        // 원 오버레이 생성
+        val circle = CircleOverlay()
+        circle.center = LatLng( todo.center_lat , todo.center_lng )
+        circle.radius = 50.0    // 원 반경 50m
+        circle.outlineWidth = 10
+        circle.outlineColor = Color.GREEN
+        circle.color = 0
+        circle.map = naverMap
 
     }
 
@@ -178,11 +184,6 @@ class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
         mapView.onLowMemory()
     }
 
-
-
-//    override fun onMapReady(p0: NaverMap) {
-//        TODO("Not yet implemented")
-//    }
 
 
 }

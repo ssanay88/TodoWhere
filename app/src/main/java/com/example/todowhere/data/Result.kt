@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 data class Result(
     @SerializedName("name") val name:String,
     @SerializedName("region") val region: Region,
-    @SerializedName("land") val land: Land
+    @SerializedName("land") val land: Land,
 )

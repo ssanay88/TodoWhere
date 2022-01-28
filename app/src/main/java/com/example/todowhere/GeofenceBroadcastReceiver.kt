@@ -79,7 +79,14 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                         var realmResult =
                             realm.where<Todo>().contains("id", it.requestId).findFirst()
                         // 해당 realm 데이터의 시간 감소
-                        realmResult!!.time -= 1
+                        if (realmResult?.state == "Doing") {
+                            realmResult.time -= 1
+                            // 0초 달성시 상태 변화
+                            if (realmResult.time.toInt() == 0) {
+                                realmResult.state = "Done"
+                            }
+                        }
+
 
                         realm.commitTransaction()   // realm 트랜잭션 종료
                     }

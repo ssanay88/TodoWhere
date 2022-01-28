@@ -11,10 +11,12 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
@@ -38,6 +40,11 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
+
+    private lateinit var myAdapter: MyAdapter
+    private lateinit var layout: LinearLayoutManager
+
+    private lateinit var timerTask: Timer
 
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
@@ -124,22 +131,18 @@ class MainActivity : AppCompatActivity() {
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+        myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
         mainBinding.TodoRecyclerView.adapter = myAdapter
 
 
         // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val layout = LinearLayoutManager(this)
+        layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
-        // popupFragment에 지도뷰 추가
-//        val fm = supportFragmentManager
-//        val mapFragment = fm.findFragmentById(R.id.MapPopUpView) as MapFragment?
-//            ?: MapFragment.newInstance().also {
-//                fm.beginTransaction().add(R.id.MapPopUpView, it).commit()
-//            }
 
 
+        // runOnUIThread로 아이템 시간 변화주기
+        ChangeTimeThread()
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
         myAdapter.setOnAddBtnClickListener(object : MyAdapter.OnAddBtnClickListener {
@@ -272,6 +275,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // 0.5초마다 어댑터에 변화 감지
+    private fun ChangeTimeThread() {
+
+            // 0.5초마다 반복
+            timerTask = kotlin.concurrent.timer(period = 500) {
+                // UI조작을 위한 메서드
+                runOnUiThread {
+                    myAdapter.notifyDataSetChanged()
+                    // Log.d(TAG,"어댑터에 알리는 중입니당")
+                }
+            }
+
+    }
+
 
     // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
     override fun onResume() {

@@ -138,6 +138,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             timerBtn.text = HourMin(item.time)    // item.time.toString()
 
 
+
             mapBtn.setOnClickListener {
                 // 지도 다이어로그 띄우기
                 mapListener?.onMapClick(item)

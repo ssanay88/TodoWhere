@@ -37,6 +37,21 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/*
+<수정 요청> 20202 - 01 - 29
+할일추가시 현재 위치로 설정되어 있지 않음 - 해결
+
+지오 펜싱 작동 유무 재확인 + 지오펜싱 작동 시 UI에서 알려주는 객체 필요 -
+
+일정 추가 후 앱 상태 Stop으로 자동 복구
+
+
+
+앱 아이콘 변경
+
+ */
+
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding

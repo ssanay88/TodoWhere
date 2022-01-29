@@ -14,6 +14,7 @@ import com.example.todowhere.ReverseGeocodingService
 import com.example.todowhere.data.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
@@ -204,6 +205,10 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 현재 위치 지정
         naverMap.locationSource = locationSource
+
+        // 카메라 현재 위치로 이동
+        val cameraUpdate = CameraUpdate.scrollTo(LatLng(locationSource.lastLocation!!.latitude, locationSource.lastLocation!!.longitude))
+        naverMap.moveCamera(cameraUpdate)
 
         // 마지막 위치를 반환이지만 아직 위치 수신 전이면 null을 반환
         if (locationSource.lastLocation == null) {

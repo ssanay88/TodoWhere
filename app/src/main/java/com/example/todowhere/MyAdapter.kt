@@ -125,7 +125,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         val TAG : String = "로그"
 
         private val todoTextView : TextView = view.findViewById(R.id.todoText)
-        private val timerBtn : Button = view.findViewById(R.id.timer_button)
+        private val timerBtn : TextView = view.findViewById(R.id.timer_button)
         private val mapBtn : ImageButton = view.findViewById(R.id.map_button)
         private val delBtn : ImageButton = view.findViewById(R.id.delete_button)
 

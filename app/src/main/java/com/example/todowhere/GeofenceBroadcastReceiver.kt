@@ -11,13 +11,12 @@ import com.google.android.gms.location.GeofencingEvent
 import io.realm.Realm
 import io.realm.kotlin.where
 import java.util.*
+import kotlin.concurrent.thread
 
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     var TAG: String = "로그"
-
-
 
     var progressingGeofences : MutableList<Geofence> = mutableListOf()
 
@@ -31,6 +30,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     val realm = Realm.getDefaultInstance()    // realm 기본 인스턴스 얻기기
 
     private var timerTask: Timer? = null    // 타이머 사용을 위한 타이머 태스크 선언언
+
 
 
     // private val geofenceCountDownTimer:CountDownTimer = object : CountDownTimer()    // 목표 시간동안 카운트 다운을 진행할 변수
@@ -91,6 +91,11 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                         realm.commitTransaction()   // realm 트랜잭션 종료
                     }
                 }
+
+                Thread(Runnable {
+
+                })
+
             }
 
             // 지오펜싱 밖으로 사용자가 나갈떄 -> 타이머 중지지

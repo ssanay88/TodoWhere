@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
@@ -41,11 +42,9 @@ import java.util.concurrent.TimeUnit
 <수정 요청> 20202 - 01 - 29
 할일추가시 현재 위치로 설정되어 있지 않음 - 해결
 
-지오 펜싱 작동 유무 재확인 + 지오펜싱 작동 시 UI에서 알려주는 객체 필요 -
+지오 펜싱 작동 유무 재확인 + 지오펜싱 작동 시 UI에서 알려주는 객체 필요 - waveView로 표시
 
 일정 추가 후 앱 상태 Stop으로 자동 복구
-
-
 
 앱 아이콘 변경
 
@@ -60,6 +59,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var layout: LinearLayoutManager
 
     private lateinit var timerTask: Timer
+
+    lateinit var geofencingClient : GeofencingClient
 
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
@@ -92,10 +93,8 @@ class MainActivity : AppCompatActivity() {
     // Start = 일정 실행을 측정하고 있는 상태 , Stop = 일정 실행 측정 종료 상태
     private var app_state = "Stop"
 
-    // Location API를 사용하기 위한 geofencing client 인스턴스 생성
-    private val geofencingClient : GeofencingClient by lazy {
-        LocationServices.getGeofencingClient(this)
-    }
+
+
 
     // BroadcastReceiver를 시작하는 PendingIntent 정의
     // appState를 인텐트로 넘겨줘야함
@@ -142,7 +141,8 @@ class MainActivity : AppCompatActivity() {
             add_blank_data(selected_date)
         }
 
-
+        // Location API를 사용하기 위한 geofencing client 인스턴스 생성
+        geofencingClient = LocationServices.getGeofencingClient(this)
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
@@ -339,8 +339,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
         // ID는 realm DB에 들어가는 id와 동일하게 적용
@@ -514,7 +512,7 @@ class MainActivity : AppCompatActivity() {
     private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long):Geofence {
         return Geofence.Builder()
             .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
-            .setCircularRegion(geo.first,geo.second,radius)    // 위치 및 반경(m)
+            .setCircularRegion(geo.first, geo.second, radius)    // 위치 및 반경(m)
             .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
             .setLoiteringDelay(10000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds
             .setTransitionTypes(
@@ -538,10 +536,10 @@ class MainActivity : AppCompatActivity() {
         CheckPermission()
         geofencingClient.addGeofences(getGeofencingRequest(geofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
-                // Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
             }
             addOnFailureListener {
-                // Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -587,34 +585,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun updateRecyclerView() {
-        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
-
-        var realmResult =
-            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-
-        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
-        if (realmResult.size == 0 ) {
-            add_blank_data(selected_date)
-        }
-
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
-        mainBinding.TodoRecyclerView.adapter = myAdapter
-
-
-        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val layout = LinearLayoutManager(this)
-        mainBinding.TodoRecyclerView.layoutManager = layout
-        myAdapter.todo_datas = realmResult
-
-
-        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
-        myAdapter.Item = find_Item_Count(selected_date)
-
-        // adapter에게 Data가 변했다는 것을 알려줍니다.
-        myAdapter.notifyDataSetChanged()
-        //myAdapter.notifyItemRemoved()
-    }
 
     override fun onDestroy() {
         super.onDestroy()

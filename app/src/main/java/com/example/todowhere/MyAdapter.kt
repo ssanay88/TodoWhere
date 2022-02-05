@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todowhere.data.Todo
+import com.scwang.wave.MultiWaveHeader
 import io.realm.Realm
 import org.jetbrains.anko.backgroundColor
 
@@ -124,10 +125,11 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
 
         val TAG : String = "로그"
 
-        private val todoTextView : TextView = view.findViewById(R.id.todoText)
-        private val timerBtn : TextView = view.findViewById(R.id.timer_button)
-        private val mapBtn : ImageButton = view.findViewById(R.id.map_button)
-        private val delBtn : ImageButton = view.findViewById(R.id.delete_button)
+        private var todoTextView : TextView = view.findViewById(R.id.todoText)
+        private var timerTextView : TextView = view.findViewById(R.id.timer_button)
+        private var mapBtn : ImageButton = view.findViewById(R.id.map_button)
+        private var delBtn : ImageButton = view.findViewById(R.id.delete_button)
+        private var doingEffect : MultiWaveHeader = view.findViewById(R.id.doingEffect)
 
         init {
             Log.d(TAG,"MyViewHolder_Update called!!")
@@ -138,9 +140,12 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             todoTextView.text = item.what
             // 아이템 상태가 완료일 경우 버튼에 완료 표시
             if (item.state == "Done") {
-                timerBtn.text = "완료"
+                timerTextView.text = "완료"
+                doingEffect.stop()
+
             } else {
-                timerBtn.text = HourMin(item.time)    // item.time.toString()
+                timerTextView.text = HourMin(item.time)    // item.time.toString()
+                doingEffect.start()
             }
 
 
@@ -185,9 +190,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         }
 
     }
-
-
-
 
 
 

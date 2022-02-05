@@ -23,7 +23,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MapDialog(val todo: Todo) : DialogFragment(), OnMapReadyCallback {
 
-
     private lateinit var mapView: MapView
     private lateinit var reverseGeocodingService: ReverseGeocodingService    // reverse geocoding 서비스
 

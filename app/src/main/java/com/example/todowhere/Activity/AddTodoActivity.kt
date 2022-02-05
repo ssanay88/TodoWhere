@@ -14,10 +14,7 @@ import com.example.todowhere.ReverseGeocodingService
 import com.example.todowhere.data.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.CameraUpdate
-import com.naver.maps.map.MapFragment
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.*
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
@@ -198,6 +195,9 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // NaverMap 객체가 준비되면 onMapReady() 콜백 메서드가 호출됩니다.
     override fun onMapReady(naverMap : NaverMap) {
+
+        this.naverMap = naverMap
+
         // 마커 객체 생성 및 지도에 추가
         val marker = Marker()
 
@@ -205,6 +205,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 현재 위치 지정
         naverMap.locationSource = locationSource
+        Log.d(TAG,"${locationSource.lastLocation?.latitude} , ${locationSource.lastLocation?.longitude}")
 
         // 카메라 현재 위치로 이동
         val cameraUpdate = CameraUpdate.scrollTo(LatLng(locationSource.lastLocation!!.latitude, locationSource.lastLocation!!.longitude))
@@ -249,6 +250,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             if (locationSource.onRequestPermissionsResult(requestCode,permissions,grantResults)) {
                 if (!locationSource.isActivated) {
                     Toast.makeText(this,"권한을 허락해주십시오",Toast.LENGTH_LONG)
+                    naverMap.locationTrackingMode = LocationTrackingMode.None
                 }
                 return
             }

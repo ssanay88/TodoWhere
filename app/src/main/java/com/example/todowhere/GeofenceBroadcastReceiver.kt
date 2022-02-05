@@ -20,6 +20,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     var progressingGeofences : MutableList<Geofence> = mutableListOf()
 
+
     val calendar: Calendar = Calendar.getInstance()    // 오늘 날짜로 캘린더 객체 생성
     var today_date = getDate(
         calendar.get(Calendar.YEAR),
@@ -79,22 +80,19 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                         var realmResult =
                             realm.where<Todo>().contains("id", it.requestId).findFirst()
                         // 해당 realm 데이터의 시간 감소
-                        if (realmResult?.state == "Doing") {
+                        if (realmResult?.state == DOING) {
                             realmResult.time -= 1
+                            Log.d(TAG,"${realmResult.time}")
                             // 0초 달성시 상태 변화
                             if (realmResult.time.toInt() == 0) {
-                                realmResult.state = "Done"
+                                realmResult.state = STOP
                             }
                         }
-
 
                         realm.commitTransaction()   // realm 트랜잭션 종료
                     }
                 }
 
-                Thread(Runnable {
-
-                })
 
             }
 
@@ -135,6 +133,11 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 year.toString() + month.toString() + day.toString()
         }
         return date
+    }
+
+    companion object {
+        val STOP ="Stop"
+        val DOING = "Doing"
     }
 
 }

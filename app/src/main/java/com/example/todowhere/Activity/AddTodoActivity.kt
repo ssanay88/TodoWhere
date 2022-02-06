@@ -1,12 +1,18 @@
 package com.example.todowhere.Activity
 
+import android.Manifest
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color.GREEN
+import android.location.Location
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.example.todowhere.BuildConfig
 import com.example.todowhere.DTO.GetAllDto
 import com.example.todowhere.R
@@ -20,6 +26,7 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
+import org.jetbrains.anko.locationManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,6 +43,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
     private lateinit var reverseGeocodingService: ReverseGeocodingService    // reverse geocoding 서비스
+
+    private lateinit var userLocationManager:LocationManager    // 현재 위치 받아오기용 LocationManager
 
     val realm = Realm.getDefaultInstance()  // 인스턴스 얻기
 
@@ -201,15 +210,25 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 마커 객체 생성 및 지도에 추가
         val marker = Marker()
 
+        // 지도에 표시할 원 오버레이 객체
         val circle = CircleOverlay()
 
-        // 현재 위치 지정
-        naverMap.locationSource = locationSource
-        Log.d(TAG,"${locationSource.lastLocation?.latitude} , ${locationSource.lastLocation?.longitude}")
+        // 현재 위치를 받아온다.
+        var userLocation = getUserLocation()
+
 
         // 카메라 현재 위치로 이동
-        val cameraUpdate = CameraUpdate.scrollTo(LatLng(locationSource.lastLocation!!.latitude, locationSource.lastLocation!!.longitude))
+        val cameraUpdate = CameraUpdate.scrollTo(LatLng(userLocation.latitude, userLocation.longitude))
         naverMap.moveCamera(cameraUpdate)
+
+        marker.position = LatLng( userLocation.latitude , userLocation.longitude )
+        marker.map = naverMap
+        circle.center = LatLng( userLocation.latitude , userLocation.longitude )
+        circle.radius = 50.0    // 원 반경 50m
+        circle.outlineWidth = 10
+        circle.outlineColor = GREEN
+        circle.color = 0
+        circle.map = naverMap
 
         // 마지막 위치를 반환이지만 아직 위치 수신 전이면 null을 반환
         if (locationSource.lastLocation == null) {
@@ -325,6 +344,24 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             realm.commitTransaction()   // 트랜잭션 종료 반영
             return true
         }
+
+    }
+
+    // 유저의 현재 위치를 반환하는 함수
+    private fun getUserLocation(): Location {
+        userLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        var userLocation: Location? = null
+        var checkFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        var checkCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (checkFineLocationPermission == PackageManager.PERMISSION_GRANTED && checkCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+            val userLocationProvider = LocationManager.GPS_PROVIDER
+            userLocation = userLocationManager?.getLastKnownLocation(userLocationProvider)
+        } else {
+            Toast.makeText(this, "위치 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+        }
+
+        return userLocation!!    // 현재 위치 반환
 
     }
 

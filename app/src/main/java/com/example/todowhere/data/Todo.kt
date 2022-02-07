@@ -12,6 +12,6 @@ open class Todo  : RealmObject() {
     var center_lat: Double = 0.0
     var center_lng: Double = 0.0
     var view_type: Int = 0
-    var state: String = "Stop"    // 진행중 : Doing , 일시 정지 : Stop
+    var state: String = "Stop"    // 진행중 : Doing , 일시 정지 : Stop , 완료 : Done
 }
 

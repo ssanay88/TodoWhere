@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import com.example.todowhere.data.Todo
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
@@ -13,6 +14,13 @@ import io.realm.kotlin.where
 import java.util.*
 import kotlin.concurrent.thread
 
+/*
+계획 등록 시 지오펜싱 등록
+처음 상태는 Doing , 지오펜싱 미작동시 Stop , 모든 계획 완료 시 Done
+
+
+
+ */
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
@@ -66,6 +74,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 triggeringGeofences.forEach {
                     if (progressingGeofences.contains(it)) {
                         Log.d(TAG,"포함된 지오펜싱입니다. ID : ${it.requestId}")
+                        Toast.makeText(context,"포함된 지오펜싱입니다. ID : ${it.requestId}",Toast.LENGTH_SHORT).show()
                     } else {
                         progressingGeofences.add(it)
                     }
@@ -138,6 +147,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     companion object {
         val STOP ="Stop"
         val DOING = "Doing"
+        val DONE = "Done"
     }
 
 }

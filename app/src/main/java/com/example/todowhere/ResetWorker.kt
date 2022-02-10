@@ -50,7 +50,7 @@ class ResetWorker(context: Context , workerparams:WorkerParameters) : Worker(con
             .addTag("TAG_OUTPUT")
             .build()
 
-        // 매일 반복하기 위해 리퀘스트를 다시 요청청
+        // 매일 반복하기 위해 리퀘스트를 다시 요청
        WorkManager.getInstance(applicationContext)
             .enqueue(dailyWorkRequest)
 

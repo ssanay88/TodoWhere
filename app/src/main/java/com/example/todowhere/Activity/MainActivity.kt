@@ -39,12 +39,15 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /*
-<수정 요청> 20202 - 02 - 06
+<수정 요청> 2022 - 02 - 06
 할일추가시 현재 위치로 설정되어 있지 않음 - 해결
 
 지오 펜싱 작동 유무 재확인 + 지오펜싱 작동 시 UI에서 알려주는 객체 필요 - waveView로 표시
+-> 지오 펜싱 작동 시 상호 작용 변경중 2022 - 02 - 10 , Geofencing이 실행되지 않는다.
 
-일정 추가 후 앱 상태 Stop으로 자동 복구
+ResetWorker 다시 코딩
+
+일정 추가 후 앱 상태 Stop으로 자동 복구 - 필요 없는 기능 삭제 2022 - 02 - 10
 
 앱 아이콘 변경
 
@@ -60,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var timerTask: Timer
 
-    lateinit var geofencingClient : GeofencingClient
+    lateinit var geofencingClient : GeofencingClient  // 지오펜싱 클라이언트의 인스턴스
 
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
@@ -89,18 +92,10 @@ class MainActivity : AppCompatActivity() {
     var saved_Lng : Double = 0.0
     var saved_time : Int = 0
 
-    // Floating Button을 통한 진행 상태 판단하기 위한 변수
-    // Start = 일정 실행을 측정하고 있는 상태 , Stop = 일정 실행 측정 종료 상태
-    private var app_state = "Stop"
-
-
-
 
     // BroadcastReceiver를 시작하는 PendingIntent 정의
-    // appState를 인텐트로 넘겨줘야함
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceBroadcastReceiver()::class.java)
-        intent.putExtra("appState",app_state)
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -274,21 +269,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-
-        // 활동 기록을 위한 상태 체크
-        mainBinding.StartStopBtn.setOnClickListener {
-            if (app_state == "Start") {
-                mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                Log.d(TAG,"now app state : $app_state")
-                app_state = "Stop"
-            }
-            else {
-                mainBinding.StartStopBtn.setImageResource(R.drawable.ic_baseline_stop_24)
-                Log.d(TAG,"now app state : $app_state")
-                app_state = "Start"
-            }
-        }
     }
 
     // 0.5초마다 어댑터에 변화 감지
@@ -536,6 +516,7 @@ class MainActivity : AppCompatActivity() {
         CheckPermission()
         geofencingClient.addGeofences(getGeofencingRequest(geofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
+                Log.d(TAG, "지오펜싱 추가 : ${geofenceList}")
                 Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
             }
             addOnFailureListener {

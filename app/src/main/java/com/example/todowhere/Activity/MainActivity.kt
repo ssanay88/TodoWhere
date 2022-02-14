@@ -506,7 +506,7 @@ class MainActivity : AppCompatActivity() {
     private fun getGeofencingRequest(list:List<Geofence>):GeofencingRequest {
         return GeofencingRequest.Builder().apply {
             // Geofence 이벤트는 진입시부터 처리할 때
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or GeofencingRequest.INITIAL_TRIGGER_DWELL)
             addGeofences(list)  // Geofence 리스트 추가
         }.build()
     }

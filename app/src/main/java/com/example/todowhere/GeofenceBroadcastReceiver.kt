@@ -12,22 +12,14 @@ import com.google.android.gms.location.GeofencingEvent
 import io.realm.Realm
 import io.realm.kotlin.where
 import java.util.*
-import kotlin.concurrent.thread
 
-/*
-계획 등록 시 지오펜싱 등록
-처음 상태는 Doing , 지오펜싱 미작동시 Stop , 모든 계획 완료 시 Done
-
-
-
- */
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     var TAG: String = "로그"
 
-    var progressingGeofences : MutableList<Geofence> = mutableListOf()
 
+    var progressingGeofences : MutableList<Geofence> = mutableListOf()
 
     val calendar: Calendar = Calendar.getInstance()    // 오늘 날짜로 캘린더 객체 생성
     var today_date = getDate(
@@ -41,14 +33,14 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     private var timerTask: Timer? = null    // 타이머 사용을 위한 타이머 태스크 선언언
 
 
-
     // private val geofenceCountDownTimer:CountDownTimer = object : CountDownTimer()    // 목표 시간동안 카운트 다운을 진행할 변수
 
     override fun onReceive(context: Context, intent: Intent) {
 
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
 
-        Log.d("GeofenceBR" , "지오펜싱 onReceive 시작!!")
+        Toast.makeText(context,"지오펜싱 시작", Toast.LENGTH_SHORT).show()
+
 
         if (geofencingEvent.hasError()) {
             val errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.errorCode)
@@ -60,67 +52,65 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         val geofenceTransition = geofencingEvent.geofenceTransition
 
 
+        // 이벤트에 따른 행동 코딩
+        // 계획 측정이 ON인 상태에서만 실행
 
-        // 지오펜싱 안으로 사용자가 들어올때 혹은 진입해있는 경우 -> 타이머 실행
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
-            Log.d(TAG, "사용자가 지오펜싱 진입 상태 : ${geofenceTransition}")
-            // 지오펜싱 이벤트가 발생한 모든 Geofence들
-            val triggeringGeofences = geofencingEvent.triggeringGeofences
 
-            // 진행되고 있는 지오펜스에 추가
-            triggeringGeofences.forEach {
-                if (progressingGeofences.contains(it)) {
-                    Log.d(TAG,"포함된 지오펜싱입니다. ID : ${it.requestId}")
-                    Toast.makeText(context,"포함된 지오펜싱입니다. ID : ${it.requestId}",Toast.LENGTH_SHORT).show()
-                } else {
-                    progressingGeofences.add(it)
+            // 지오펜싱 안으로 사용자가 들어올때 혹은 진입해있는 경우 -> 타이머 실행
+            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
+                Log.d(TAG, "사용자가 지오펜싱 진입")
+                // 지오펜싱 이벤트가 발생한 모든 Geofence들
+                val triggeringGeofences = geofencingEvent.triggeringGeofences
+
+                // 진행되고 있는 지오펜스에 추가
+                triggeringGeofences.forEach {
+                    if (progressingGeofences.contains(it)) {
+                        Log.d(TAG,"포함된 지오펜싱입니다. ID : ${it.requestId}")
+                    } else {
+                        progressingGeofences.add(it)
+                    }
+                }
+
+                // 1초마다 진행할 것
+                timerTask = kotlin.concurrent.timer(period = 1000) {
+                    // 진행 중인 지오펜싱 리스트 중에서 하나씩 시간 감소
+                    progressingGeofences.forEach {
+                        realm.beginTransaction()    // realm 트랜잭션 시작
+
+                        var realmResult =
+                            realm.where<Todo>().contains("id", it.requestId).findFirst()
+                        // 해당 realm 데이터의 시간 감소
+                        realmResult!!.time -= 1
+
+                        realm.commitTransaction()   // realm 트랜잭션 종료
+                    }
                 }
             }
 
-            // 1초마다 진행할 것
-//            timerTask = kotlin.concurrent.timer(period = 1000) {
-//                // 진행 중인 지오펜싱 리스트 중에서 하나씩 시간 감소
-//                progressingGeofences.forEach {
-//                    realm.beginTransaction()    // realm 트랜잭션 시작
-//
-//                    var realmResult =
-//                        realm.where<Todo>().contains("id", it.requestId).findFirst()
-//                    // 해당 realm 데이터의 시간 감소
-//                    if (realmResult?.state == DOING) {
-//                        realmResult.time -= 1
-//                        Log.d(TAG,"${realmResult.time}")
-//                        // 0초 달성시 상태 변화
-//                        if (realmResult.time.toInt() == 0) {
-//                            realmResult.state = STOP
-//                        }
-//                    }
-//
-//                    realm.commitTransaction()   // realm 트랜잭션 종료
-//                }
-//            }
+            // 지오펜싱 밖으로 사용자가 나갈떄 -> 타이머 중지지
+            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+                Log.d(TAG, "사용자가 지오펜싱 진출")
 
+                val triggeringGeofences = geofencingEvent.triggeringGeofences
 
-        }
-
-        // 지오펜싱 밖으로 사용자가 나갈떄 -> 타이머 중지지
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            Log.d(TAG, "사용자가 지오펜싱 벗어남")
-
-            val triggeringGeofences = geofencingEvent.triggeringGeofences
-
-            triggeringGeofences.forEach {
-                if (it in progressingGeofences) {
-                    progressingGeofences.remove(it)
-                } else {
-                    // 삭제할 Geofence 없음
+                triggeringGeofences.forEach {
+                    if (it in progressingGeofences) {
+                        progressingGeofences.remove(it)
+                    } else {
+                        // 삭제할 Geofence 없음
+                    }
                 }
+
             }
 
-        }
 
 
-        // timerTask?.cancel()    // appState가 Stop일 경우 타이머 종료
+        timerTask?.cancel()
 
+
+    }
+
+    private fun updateUi() {
 
     }
 
@@ -138,12 +128,6 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 year.toString() + month.toString() + day.toString()
         }
         return date
-    }
-
-    companion object {
-        val STOP ="Stop"
-        val DOING = "Doing"
-        val DONE = "Done"
     }
 
 }

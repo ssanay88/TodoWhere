@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Activity.MainActivity">
 
+
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/CalendarView"
         android:layout_width="0dp"
@@ -17,11 +18,13 @@
         android:background="@drawable/calendar_background"
         app:layout_constraintBottom_toTopOf="@+id/TodoRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:mcv_titleAnimationOrientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:mcv_arrowColor="@color/sky_200"
-        app:mcv_selectionColor="@color/sky_200" />
 
+        app:mcv_selectionColor="@color/sky_200" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/TodoRecyclerView"

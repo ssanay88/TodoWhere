@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color.GREEN
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -44,7 +45,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap     // 네이버 맵 사용을 위한 선언
     private lateinit var reverseGeocodingService: ReverseGeocodingService    // reverse geocoding 서비스
 
-    private lateinit var userLocationManager:LocationManager    // 현재 위치 받아오기용 LocationManager
+    private var userLocationManager : LocationManager? = null    // 현재 위치 받아오기용 LocationManager
+    private var userLocationListener : LocationListener? = null    // 위치 감지 Listener
 
     val realm = Realm.getDefaultInstance()  // 인스턴스 얻기
 
@@ -214,21 +216,22 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         val circle = CircleOverlay()
 
         // 현재 위치를 받아온다.
-        var userLocation = getUserLocation()
+        getUserLocation(naverMap)
 
+        var checkFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        var checkCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-        // 카메라 현재 위치로 이동
-        val cameraUpdate = CameraUpdate.scrollTo(LatLng(userLocation.latitude, userLocation.longitude))
-        naverMap.moveCamera(cameraUpdate)
-
-        marker.position = LatLng( userLocation.latitude , userLocation.longitude )
-        marker.map = naverMap
-        circle.center = LatLng( userLocation.latitude , userLocation.longitude )
-        circle.radius = 50.0    // 원 반경 50m
-        circle.outlineWidth = 10
-        circle.outlineColor = GREEN
-        circle.color = 0
-        circle.map = naverMap
+        if (checkFineLocationPermission == PackageManager.PERMISSION_GRANTED && checkCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+            userLocationManager!!.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                1000L,
+                30f,
+                userLocationListener!!
+            )
+        } else {
+            Toast.makeText(this, "위치 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
 
         // 마지막 위치를 반환이지만 아직 위치 수신 전이면 null을 반환
         if (locationSource.lastLocation == null) {
@@ -348,21 +351,44 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 유저의 현재 위치를 반환하는 함수
-    private fun getUserLocation(): Location {
+    private fun getUserLocation(naverMap: NaverMap) {
+
         userLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        var userLocation: Location? = null
-        var checkFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        var checkCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        userLocationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                var lat = 0.0
+                var lng = 0.0
+                if (location != null) {
+                    lat = location.latitude
+                    lng = location.longitude
+                }
 
-        if (checkFineLocationPermission == PackageManager.PERMISSION_GRANTED && checkCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-            val userLocationProvider = LocationManager.GPS_PROVIDER
-            userLocation = userLocationManager?.getLastKnownLocation(userLocationProvider)
-        } else {
-            Toast.makeText(this, "위치 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                // 선택 좌표 선언
+                selected_Lat = lat
+                selected_Lng = lng
+
+                // 지도에 표시
+                // 마커 객체 생성 및 지도에 추가
+                val marker = Marker()
+
+                // 지도에 표시할 원 오버레이 객체
+                val circle = CircleOverlay()
+
+                // 카메라 현재 위치로 이동
+                val cameraUpdate = CameraUpdate.scrollTo(LatLng(lat, lng))
+                naverMap.moveCamera(cameraUpdate)
+
+                marker.position = LatLng( lat , lng )
+                marker.map = naverMap
+                circle.center = LatLng( lat , lng )
+                circle.radius = 50.0    // 원 반경 50m
+                circle.outlineWidth = 10
+                circle.outlineColor = GREEN
+                circle.color = 0
+                circle.map = naverMap
+
+            }
         }
-
-        return userLocation!!    // 현재 위치 반환
-
     }
 
     // 지오펜스 객체를 생성하는 함수

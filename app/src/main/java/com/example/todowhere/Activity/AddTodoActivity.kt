@@ -244,23 +244,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-        // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
-        naverMap.setOnMapClickListener { pointF, coord ->
-            // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
-            marker.position = LatLng( coord.latitude , coord.longitude )
-            marker.map = naverMap
-            circle.center = LatLng( coord.latitude , coord.longitude )
-            circle.radius = 50.0    // 원 반경 50m
-            circle.outlineWidth = 10
-            circle.outlineColor = GREEN
-            circle.color = 0
-            circle.map = naverMap
-            // 선택된 중심 좌표 값 저장
-            selected_Lat = coord.latitude
-            selected_Lng = coord.longitude
 
-
-        }
     }
 
     override fun onRequestPermissionsResult(
@@ -353,6 +337,14 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     // 유저의 현재 위치를 반환하는 함수
     private fun getUserLocation(naverMap: NaverMap) {
 
+        // 마커 객체 생성 및 지도에 추가
+        val marker = Marker()
+
+        // 지도에 표시할 원 오버레이 객체
+        val circle = CircleOverlay()
+
+
+
         userLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         userLocationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
@@ -367,12 +359,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                 selected_Lat = lat
                 selected_Lng = lng
 
-                // 지도에 표시
-                // 마커 객체 생성 및 지도에 추가
-                val marker = Marker()
-
-                // 지도에 표시할 원 오버레이 객체
-                val circle = CircleOverlay()
+                // 지도에 표시 //
 
                 // 카메라 현재 위치로 이동
                 val cameraUpdate = CameraUpdate.scrollTo(LatLng(lat, lng))
@@ -389,6 +376,23 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
             }
         }
+
+        // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
+        naverMap.setOnMapClickListener { pointF, coord ->
+            // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
+            marker.position = LatLng( coord.latitude , coord.longitude )
+            marker.map = naverMap
+            circle.center = LatLng( coord.latitude , coord.longitude )
+            circle.radius = 50.0    // 원 반경 50m
+            circle.outlineWidth = 10
+            circle.outlineColor = GREEN
+            circle.color = 0
+            circle.map = naverMap
+            // 선택된 중심 좌표 값 저장
+            selected_Lat = coord.latitude
+            selected_Lng = coord.longitude
+        }
+
     }
 
     // 지오펜스 객체를 생성하는 함수

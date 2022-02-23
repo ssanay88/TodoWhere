@@ -8,6 +8,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +22,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -58,12 +62,27 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
 
+    var mLocationManager: LocationManager? = null    // 위치 서비스에 접근하는 클래스를 제공
+    var mLocationListener: LocationListener? = null    // 위치가 변할 때 LocationManager로부터 notification을 받는 용도
+
     private lateinit var myAdapter: MyAdapter
     private lateinit var layout: LinearLayoutManager
 
     private lateinit var timerTask: Timer
 
-    lateinit var geofencingClient : GeofencingClient  // 지오펜싱 클라이언트의 인스턴스
+    // Geofencing을 저장할 리스트
+    val geofenceList : MutableList<Geofence> = mutableListOf()
+
+    // Location API를 사용하기 위한 geofencing client 인스턴스 생성
+    private val geofencingClient : GeofencingClient by lazy { // 지오펜싱 클라이언트의 인스턴스
+        LocationServices.getGeofencingClient(this)
+    }
+
+    // BroadcastReceiver를 시작하는 PendingIntent 정의
+    private val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
 
     // 오늘 날짜로 캘린더 객체 생성
     val calendar: Calendar = Calendar.getInstance()
@@ -93,16 +112,6 @@ class MainActivity : AppCompatActivity() {
     var saved_time : Int = 0
 
 
-    // BroadcastReceiver를 시작하는 PendingIntent 정의
-    private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver()::class.java)
-        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
-
-    // Geofencing을 저장할 리스트
-    val geofenceList : MutableList<Geofence> = mutableListOf()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +125,9 @@ class MainActivity : AppCompatActivity() {
 
         // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         resetworkManager()
+
+        // 위치가 업데이트될 때
+        whenUpdateLocation()
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_addtodoactivity = getIntent()
@@ -136,8 +148,8 @@ class MainActivity : AppCompatActivity() {
             add_blank_data(selected_date)
         }
 
-        // Location API를 사용하기 위한 geofencing client 인스턴스 생성
-        geofencingClient = LocationServices.getGeofencingClient(this)
+
+
 
         // 리사이클러뷰 관련 선언
         // MyAdapter를 생성 후 recyclerview의 adapter로 선언해줍니다.
@@ -478,19 +490,23 @@ class MainActivity : AppCompatActivity() {
             .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
             .setCircularRegion(geo.first, geo.second, radius)    // 위치 및 반경(m)
             .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
-            .setLoiteringDelay(10000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds
+            .setLoiteringDelay(1000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds TODO DWELL 판단 시간 나중에 수정 필요
             .setTransitionTypes(
-                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT or Geofence.GEOFENCE_TRANSITION_DWELL)
+                Geofence.GEOFENCE_TRANSITION_ENTER or
+                        Geofence.GEOFENCE_TRANSITION_EXIT or
+                        Geofence.GEOFENCE_TRANSITION_DWELL)
             .build()
     }
 
     // Geofence 지정 및 관련 이벤트 트리거 방식을 설정하기 위해 GeofencingRequest 빌드
     // INITIAL_TRIGGER_ENTER를 지정하면 기기가 이미 지오펜싱 내부에 있는 경우 GEOFENCE_TRANSITION_ENTER를
     // 트리거해야 한다고 위치 서비스에 알림
-    private fun getGeofencingRequest(list:List<Geofence>):GeofencingRequest {
+    private fun getGeofencingRequest(list:List<Geofence>): GeofencingRequest {
         return GeofencingRequest.Builder().apply {
             // Geofence 이벤트는 진입시부터 처리할 때
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or GeofencingRequest.INITIAL_TRIGGER_DWELL)
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or
+                    GeofencingRequest.INITIAL_TRIGGER_DWELL or
+                    GeofencingRequest.INITIAL_TRIGGER_EXIT)
             addGeofences(list)  // Geofence 리스트 추가
         }.build()
     }
@@ -500,11 +516,11 @@ class MainActivity : AppCompatActivity() {
         CheckPermission()
         geofencingClient.addGeofences(getGeofencingRequest(geofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
-                Log.d(TAG, "지오펜싱 추가 : ${geofenceList}")
-                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "지오펜싱 리스트 : ${geofenceList}")
             }
             addOnFailureListener {
-                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -549,6 +565,44 @@ class MainActivity : AppCompatActivity() {
         realm.commitTransaction()
 
     }
+
+    private fun whenUpdateLocation() {
+        mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        mLocationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                var lat = 0.0
+                var lng = 0.0
+                if (location != null) {
+                    lat = location.latitude
+                    lng = location.longitude
+                    Log.d("로그", " 현재 위치는 $lat , $lng ")
+                }
+
+                Toast.makeText(this@MainActivity,"현재 위치는 $lat , $lng 입니다.",Toast.LENGTH_SHORT).show()
+
+
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        mLocationManager!!.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            3000L,
+            30f, mLocationListener as LocationListener
+        )
+    }
+
+
 
 
     override fun onDestroy() {

@@ -355,6 +355,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                     lng = location.longitude
                 }
 
+                Log.d(TAG,"현재 위치는 $lat , $lng 입니다.")
+
                 // 선택 좌표 선언
                 selected_Lat = lat
                 selected_Lng = lng

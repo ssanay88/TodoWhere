@@ -70,10 +70,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var timerTask: Timer
 
-    // Geofencing을 저장할 리스트
-    val geofenceList : MutableList<Geofence> = mutableListOf()
 
-    // Location API를 사용하기 위한 geofencing client 인스턴스 생성
+    val geofenceList : MutableList<Geofence> = mutableListOf()    // 모든 Geofencing을 저장할 리스트
+    val todayGeofenceList : MutableList<Geofence> = mutableListOf()    // 오늘 작동할 Geofencing만 담은 리스트
+
+   // Location API를 사용하기 위한 geofencing client 인스턴스 생성
     private val geofencingClient : GeofencingClient by lazy { // 지오펜싱 클라이언트의 인스턴스
         LocationServices.getGeofencingClient(this)
     }
@@ -172,6 +173,12 @@ class MainActivity : AppCompatActivity() {
             // onBtnClick 오버라이드 정의
             override fun onAddClick() {
 
+                // 오늘보다 이전에는 일정을 추가할 수 없다.
+                if (selected_date.toInt() < today_date.toInt()) {
+                    Toast.makeText(this@MainActivity,"과거에는 일정을 추가하실 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    return@onAddClick
+                }
+
                 Log.d(TAG,"일정 추가 버튼 클릭 !!")
 
                 var next_intent = Intent(this@MainActivity, AddTodoActivity::class.java).apply {
@@ -226,17 +233,6 @@ class MainActivity : AppCompatActivity() {
                 // TODO 위치를 띄우는 팝업 구현
                 val dialog = MapDialog(todo)
                 dialog.show(supportFragmentManager, "MapDialog")
-//                val mapDialogView = LayoutInflater.from(this@MainActivity).inflate(R.layout.map_popup,null)
-//                val mapBuilder = AlertDialog.Builder(this@MainActivity)
-//                    .setView(mapDialogView)
-//                    // .create()
-//
-//                val mAlertDialog = mapBuilder.show()
-//
-//                val backBtn = mapDialogView.findViewById<ImageButton>(R.id.backBtn)
-//                backBtn.setOnClickListener {
-//                    mAlertDialog.dismiss()
-//                }
 
             }
         })
@@ -330,11 +326,16 @@ class MainActivity : AppCompatActivity() {
         myAdapter.notifyDataSetChanged()
 
 
-
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
         // ID는 realm DB에 들어가는 id와 동일하게 적용
-        geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+        // 오늘 날짜일 경우 todayGeofenceList에 추가
+        if (selected_date == today_date) {
+            todayGeofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+        } else {
+            // 미래의 일정일 경우 다른 리스트에 추가
+            geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+        }
         addGeofences()    // geofencing 추가
 
     }
@@ -514,10 +515,10 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun addGeofences() {
         CheckPermission()
-        geofencingClient.addGeofences(getGeofencingRequest(geofenceList),geofencePendingIntent).run {
+        geofencingClient.addGeofences(getGeofencingRequest(todayGeofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
                 Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "지오펜싱 리스트 : ${geofenceList}")
+                Log.d(TAG, "지오펜싱 리스트 : ${todayGeofenceList}")
             }
             addOnFailureListener {
                 Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_SHORT).show()
@@ -525,6 +526,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // TODO 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
     // 매일 상태를 리셋할 함수
     private fun resetworkManager() {
         val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
@@ -532,8 +534,10 @@ class MainActivity : AppCompatActivity() {
             .addTag("Reset")
             .build()
 
-
         WorkManager.getInstance(this).enqueue(dailyResetRequeset)
+
+
+
     }
 
     // 실행 지연 시간을 설정하는 함수
@@ -577,9 +581,6 @@ class MainActivity : AppCompatActivity() {
                     lng = location.longitude
                     Log.d("로그", " 현재 위치는 $lat , $lng ")
                 }
-
-                Toast.makeText(this@MainActivity,"현재 위치는 $lat , $lng 입니다.",Toast.LENGTH_SHORT).show()
-
 
             }
         }

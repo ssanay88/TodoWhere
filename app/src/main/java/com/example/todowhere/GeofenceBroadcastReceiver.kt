@@ -60,18 +60,16 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         // 지오펜싱 안으로 사용자가 들어올때 혹은 진입해있는 경우 -> 타이머 실행
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
             geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
-            Log.d(TAG, "사용자가 지오펜싱 진입")
+            Log.d(TAG, "사용자가 지오펜싱 진입함")
             // 지오펜싱 이벤트가 발생한 모든 Geofence들
             val triggeringGeofences = geofencingEvent.triggeringGeofences
 
             // 진행되고 있는 지오펜스에 추가
             triggeringGeofences.forEach {
-                if (progressingGeofences.contains(it)) {
-                    Log.d(TAG,"포함된 지오펜싱입니다. ID : ${it.requestId}")
-                } else {
-                    progressingGeofences.add(it)
-                }
-                Log.d(TAG,"현재 진행하고 있는 지오펜싱 : $it")
+
+                // Enter Or Dwell인 경우 타이머 시작작
+
+               Log.d(TAG,"${it.requestId}")
             }
 
 //                // 1초마다 진행할 것
@@ -92,17 +90,13 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
             // 지오펜싱 밖으로 사용자가 나갈떄 -> 타이머 중지지
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-                Log.d(TAG, "사용자가 지오펜싱 진출")
+                Log.d(TAG, "사용자가 지오펜싱 벗어남")
 
                 val triggeringGeofences = geofencingEvent.triggeringGeofences
 
                 triggeringGeofences.forEach {
-                    if (it in progressingGeofences) {
-                        progressingGeofences.remove(it)
-                    } else {
-                        // 삭제할 Geofence 없음
-                    }
-                    Log.d(TAG,"삭제 후 지오펜싱 : $it")
+
+                    Log.d(TAG,"${it.requestId}")
                 }
             }
 //        timerTask?.cancel()

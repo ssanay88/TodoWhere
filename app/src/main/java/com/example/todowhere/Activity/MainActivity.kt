@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
     val geofenceList : MutableList<Geofence> = mutableListOf()    // 모든 Geofencing을 저장할 리스트
     val todayGeofenceList : MutableList<Geofence> = mutableListOf()    // 오늘 작동할 Geofencing만 담은 리스트
 
+
+
    // Location API를 사용하기 위한 geofencing client 인스턴스 생성
     private val geofencingClient : GeofencingClient by lazy { // 지오펜싱 클라이언트의 인스턴스
         LocationServices.getGeofencingClient(this)
@@ -121,14 +123,13 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG,"onCreate() 시작")
 
-        // 위치 권환 요청
-        CheckPermission()
 
-        // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
-        resetworkManager()
+        CheckPermission()    // 위치 권환 요청
+        resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
+        whenUpdateLocation()    // 위치가 업데이트될 때
+        findTodayGeofence()    // 오늘 날짜의 지오펜싱 찾기
 
-        // 위치가 업데이트될 때
-        whenUpdateLocation()
+
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_addtodoactivity = getIntent()
@@ -271,13 +272,17 @@ class MainActivity : AppCompatActivity() {
             // adapter에게 Data가 변했다는 것을 알려줍니다.
             myAdapter.notifyDataSetChanged()
 
-            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
-            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
-            Log.d(TAG, "DB : $realmResult")
+//            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
+//            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
+//            Log.d(TAG, "DB : $realmResult")
+            Log.d(TAG,"전체 지오펜싱 리스트 : $geofenceList")
+            Log.d(TAG,"오늘의 지오펜싱 리스트 : $todayGeofenceList")
+
         }
 
 
     }
+
 
     // 0.5초마다 어댑터에 변화 감지
     private fun ChangeTimeThread() {
@@ -332,11 +337,15 @@ class MainActivity : AppCompatActivity() {
         // 오늘 날짜일 경우 todayGeofenceList에 추가
         if (selected_date == today_date) {
             todayGeofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+            geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
         } else {
             // 미래의 일정일 경우 다른 리스트에 추가
             geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
         }
+        // TODO
         addGeofences()    // geofencing 추가
+
+
 
     }
 
@@ -518,7 +527,7 @@ class MainActivity : AppCompatActivity() {
         geofencingClient.addGeofences(getGeofencingRequest(todayGeofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
                 Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "지오펜싱 리스트 : ${todayGeofenceList}")
+                Log.d(TAG, "추가 후 지오펜싱 리스트 : ${todayGeofenceList}")
             }
             addOnFailureListener {
                 Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_SHORT).show()
@@ -570,6 +579,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // 현제 위치
     private fun whenUpdateLocation() {
         mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         mLocationListener = object : LocationListener {
@@ -581,7 +591,6 @@ class MainActivity : AppCompatActivity() {
                     lng = location.longitude
                     Log.d("로그", " 현재 위치는 $lat , $lng ")
                 }
-
             }
         }
 
@@ -602,6 +611,16 @@ class MainActivity : AppCompatActivity() {
             30f, mLocationListener as LocationListener
         )
     }
+
+    // 오늘 날짜의 지오펜싱
+    private fun findTodayGeofence() {
+        geofenceList.forEach {
+            if (it.requestId.substring(0,8) == today_date) {
+                todayGeofenceList.add(it)
+            }
+        }
+    }
+
 
 
 

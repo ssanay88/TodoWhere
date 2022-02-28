@@ -209,11 +209,6 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         this.naverMap = naverMap
 
-        // 마커 객체 생성 및 지도에 추가
-        val marker = Marker()
-
-        // 지도에 표시할 원 오버레이 객체
-        val circle = CircleOverlay()
 
         // 현재 위치를 받아온다.
         getUserLocation(naverMap)

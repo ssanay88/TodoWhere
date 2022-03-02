@@ -18,7 +18,7 @@ import com.example.todowhere.BuildConfig
 import com.example.todowhere.DTO.GetAllDto
 import com.example.todowhere.R
 import com.example.todowhere.ReverseGeocodingService
-import com.example.todowhere.data.Todo
+import com.example.todowhere.RealmDB.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
@@ -27,7 +27,6 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import io.realm.Realm
 import io.realm.kotlin.createObject
-import org.jetbrains.anko.locationManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

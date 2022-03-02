@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.example.todowhere.DTO.GetAllDto
-import com.example.todowhere.data.Todo
+import com.example.todowhere.RealmDB.Todo
 
 import com.example.todowhere.databinding.MapPopupBinding
 import com.naver.maps.geometry.LatLng

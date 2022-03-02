@@ -2,10 +2,8 @@ package com.example.todowhere.Activity
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -14,12 +12,8 @@ import android.location.LocationManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -27,13 +21,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.todowhere.*
-import com.example.todowhere.data.Todo
+import com.example.todowhere.RealmDB.Geofencing
+import com.example.todowhere.RealmDB.Todo
 import com.example.todowhere.databinding.ActivityMainBinding
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
-import com.naver.maps.map.MapFragment
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.createObject
@@ -65,15 +59,13 @@ class MainActivity : AppCompatActivity() {
     var mLocationManager: LocationManager? = null    // 위치 서비스에 접근하는 클래스를 제공
     var mLocationListener: LocationListener? = null    // 위치가 변할 때 LocationManager로부터 notification을 받는 용도
 
-    private lateinit var myAdapter: MyAdapter
-    private lateinit var layout: LinearLayoutManager
+    private lateinit var myAdapter: MyAdapter    // 리사이클러뷰 어댑터
+    private lateinit var layout: LinearLayoutManager    // 리사이클러뷰 레이아웃
 
-    private lateinit var timerTask: Timer
+    private lateinit var timerTask: Timer    // 타이머에 사용할 TimerTask
 
 
-    val geofenceList : MutableList<Geofence> = mutableListOf()    // 모든 Geofencing을 저장할 리스트
     val todayGeofenceList : MutableList<Geofence> = mutableListOf()    // 오늘 작동할 Geofencing만 담은 리스트
-
 
 
    // Location API를 사용하기 위한 geofencing client 인스턴스 생성
@@ -124,11 +116,11 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG,"onCreate() 시작")
 
 
+
         CheckPermission()    // 위치 권환 요청
         resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
-        findTodayGeofence()    // 오늘 날짜의 지오펜싱 찾기
-
+        getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
 
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
@@ -229,7 +221,7 @@ class MainActivity : AppCompatActivity() {
 
         // Map버튼 클릭 시
         myAdapter.setOnMapBtnClickListener(object : MyAdapter.OnMapBtnClickListener {
-            override fun onMapClick(todo:Todo) {
+            override fun onMapClick(todo: Todo) {
                 Log.d(TAG,"맵 버튼 클릭")
                 // TODO 위치를 띄우는 팝업 구현
                 val dialog = MapDialog(todo)
@@ -275,7 +267,7 @@ class MainActivity : AppCompatActivity() {
 //            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
 //            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
 //            Log.d(TAG, "DB : $realmResult")
-            Log.d(TAG,"전체 지오펜싱 리스트 : $geofenceList")
+
             Log.d(TAG,"오늘의 지오펜싱 리스트 : $todayGeofenceList")
 
         }
@@ -284,19 +276,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // 0.5초마다 어댑터에 변화 감지
-    private fun ChangeTimeThread() {
-
-            // 0.5초마다 반복
-            timerTask = kotlin.concurrent.timer(period = 500) {
-                // UI조작을 위한 메서드
-                runOnUiThread {
-                    myAdapter.notifyDataSetChanged()
-                    // Log.d(TAG,"어댑터에 알리는 중입니당")
-                }
-            }
-
-    }
 
 
     // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
@@ -304,6 +283,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         Log.d(TAG,"onResume() 시작")
+
         // 이거 없으면 클릭리스너 작동 X - 11.18
         val mainBinding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -333,22 +313,39 @@ class MainActivity : AppCompatActivity() {
 
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
-        // ID는 realm DB에 들어가는 id와 동일하게 적용
-        // 오늘 날짜일 경우 todayGeofenceList에 추가
-        if (selected_date == today_date) {
-            todayGeofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
-            geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
-        } else {
-            // 미래의 일정일 경우 다른 리스트에 추가
-            geofenceList.add(getGeofence(selected_date+cur_time_form,(Pair(saved_Lat,saved_Lng)),50f,saved_time.toLong()))
+        // 새로운 좌표를 입력 받은 경우만 추가
+        if (saved_Lat != 0.0 && saved_Lng != 0.0) {
+            add_geofence_DB(selected_date+cur_time_form,saved_Lat,saved_Lng)
+            getTodayGeofencing()
+
+            // TODO
+            addGeofences()    // geofencing 추가
         }
-        // TODO
-        addGeofences()    // geofencing 추가
-
-
 
     }
 
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()   // 인스턴스 해제
+    }
+
+
+
+    // 0.5초마다 어댑터에 변화 감지
+    private fun ChangeTimeThread() {
+
+        // 0.5초마다 반복
+        timerTask = kotlin.concurrent.timer(period = 500) {
+            // UI조작을 위한 메서드
+            runOnUiThread {
+                myAdapter.notifyDataSetChanged()
+                // Log.d(TAG,"어댑터에 알리는 중입니당")
+            }
+        }
+
+    }
 
     // 날짜를 원하는 8자리로 만들어주는 함수
    fun getDate(year : Int , month : Int , day : Int) : String {
@@ -377,24 +374,182 @@ class MainActivity : AppCompatActivity() {
 
         val realmResult = realm.where<Todo>().contains("id",date).findAll()
 
-        Log.d(TAG," 지금 아이템 수 : ${realmResult.size}")
-
         return realmResult.size
 
     }
 
     // 일정 추가를 위한 빈 데이터 추가
-    fun add_blank_data(date : String) : Unit {
+    fun add_blank_data(date : String) {
         realm.beginTransaction()
         // id를 선택한 날짜 + 999999 형태로 설정
         val blank_item = realm.createObject<Todo>(date + "999999")
         blank_item.what = "BLANK"
 
         realm.commitTransaction()
+    }
+
+
+
+    // 새로 생성된 지오펜싱 데이터를 DB에 추가
+    private fun add_geofence_DB(geofencingId: String, savedLat: Double, savedLng: Double) {
+        realm.beginTransaction()    // 트랜잭션 시작
+
+        // 객체 생성
+        val newGeofencing = realm.createObject<Geofencing>(geofencingId)
+        newGeofencing.lat = savedLat    // 위도 설정
+        newGeofencing.lng = savedLng    // 경도 설정
+
+        realm.commitTransaction()    // 트랜잭션 종료 및 반영영
+    }
+
+
+    // 지오펜스 객체를 생성하는 함수
+    private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long):Geofence {
+        return Geofence.Builder()
+            .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
+            .setCircularRegion(geo.first, geo.second, radius)    // 위치 및 반경(m)
+            .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
+            .setLoiteringDelay(1000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds TODO DWELL 판단 시간 나중에 수정 필요
+            .setTransitionTypes(
+                Geofence.GEOFENCE_TRANSITION_ENTER or
+                        Geofence.GEOFENCE_TRANSITION_EXIT or
+                        Geofence.GEOFENCE_TRANSITION_DWELL)
+            .build()
+    }
+
+    // Geofence 지정 및 관련 이벤트 트리거 방식을 설정하기 위해 GeofencingRequest 빌드
+    // INITIAL_TRIGGER_ENTER를 지정하면 기기가 이미 지오펜싱 내부에 있는 경우 GEOFENCE_TRANSITION_ENTER를
+    // 트리거해야 한다고 위치 서비스에 알림
+    private fun getGeofencingRequest(list:List<Geofence>): GeofencingRequest {
+        return GeofencingRequest.Builder().apply {
+            // Geofence 이벤트는 진입시부터 처리할 때
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or
+                    GeofencingRequest.INITIAL_TRIGGER_DWELL or
+                    GeofencingRequest.INITIAL_TRIGGER_EXIT)
+            addGeofences(list)  // Geofence 리스트 추가
+        }.build()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun addGeofences() {
+        CheckPermission()
+        geofencingClient.addGeofences(getGeofencingRequest(todayGeofenceList),geofencePendingIntent).run {
+            addOnSuccessListener {
+                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "추가 후 지오펜싱 리스트 : ${todayGeofenceList}")
+            }
+            addOnFailureListener {
+                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들을 리스트에 추가하는 함수
+    private fun getTodayGeofencing() {
+        val realmResult = realm.where<Geofencing>().contains("id",today_date).findAll()
+
+        realmResult.forEach {
+            var nowGeofence = getGeofence(it.id,(Pair(it.lat,it.lng)),50f,Geofence.NEVER_EXPIRE)
+            if (todayGeofenceList.contains(nowGeofence)) {
+            } else {
+                todayGeofenceList.add(nowGeofence)
+            }
+        }
+
+        Log.d(TAG," 현재 지오펜싱 리스트 : ${todayGeofenceList}")
 
     }
 
-    // 권한 확인
+
+    // TODO 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
+    // 매일 상태를 리셋할 함수
+    private fun resetworkManager() {
+        val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
+                .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)    // 초기 지연 설정
+            .addTag("Reset")
+            .build()
+
+        WorkManager.getInstance(this).enqueue(dailyResetRequeset)
+
+    }
+
+    // 실행 지연 시간을 설정하는 함수
+    fun getTimeUsingInWorkRequest() : Long {
+        val currentDate = Calendar.getInstance()
+        val dueDate = Calendar.getInstance()
+
+        dueDate.set(Calendar.HOUR_OF_DAY, 3)
+        dueDate.set(Calendar.MINUTE, 0)
+        dueDate.set(Calendar.SECOND, 0)
+
+        if(dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24)
+        }
+
+        return dueDate.timeInMillis - currentDate.timeInMillis
+    }
+
+    fun deleteFromDB(ID: String) {
+
+        realm.beginTransaction()
+
+        // 일정 DB에서 삭제
+        var todoResult = realm.where<Todo>().equalTo("id",ID).findFirst()
+        if (todoResult != null) {
+            Log.d(ContentValues.TAG, "삭제 일정 : $todoResult")
+            todoResult.deleteFromRealm()
+        }
+
+        // 지오펜싱 삭제
+        var geofencingResult = realm.where<Geofencing>().equalTo("id",ID).findFirst()
+        if (geofencingResult != null) {
+            Log.d(ContentValues.TAG, "삭제 지오펜싱 : $todoResult")
+            geofencingResult.deleteFromRealm()
+        }
+
+        realm.commitTransaction()
+
+    }
+
+    // 현제 위치
+    private fun whenUpdateLocation() {
+        mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        mLocationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                var lat = 0.0
+                var lng = 0.0
+                if (location != null) {
+                    lat = location.latitude
+                    lng = location.longitude
+                    Log.d("로그", " 현재 위치는 $lat , $lng ")
+                }
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        mLocationManager!!.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            3000L,
+            30f, mLocationListener as LocationListener
+        )
+    }
+
+
+
+
+
+
+    /////////////// 권한 관련 함수  /////////////////////
     fun CheckPermission() {
 
         // ACCESS_FINE_LOCATION 허용 시 ACCESS_COARSE_LOCATION 권한도 허용, 반대는 X
@@ -447,7 +602,7 @@ class MainActivity : AppCompatActivity() {
                         Log.d(TAG,"사용자가 권한 허용")
                         // 세팅으로 가서 무조건 허용하도록 작성성
 
-                   }
+                    }
                 }
             }
 
@@ -492,142 +647,6 @@ class MainActivity : AppCompatActivity() {
         val dialog = builder.create()
         dialog.show()
 
-    }
-
-    // 지오펜스 객체를 생성하는 함수
-    private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long):Geofence {
-        return Geofence.Builder()
-            .setRequestId(reqId)    // 이벤트 발생시 BroadcastReceiver에서 구분할 id
-            .setCircularRegion(geo.first, geo.second, radius)    // 위치 및 반경(m)
-            .setExpirationDuration(time)    // Geofence 만료 시간 ,단위 : milliseconds
-            .setLoiteringDelay(1000)    // 지오펜싱 입장과 머물기를 판단하는데 필요한 시간, 단위 : milliseconds TODO DWELL 판단 시간 나중에 수정 필요
-            .setTransitionTypes(
-                Geofence.GEOFENCE_TRANSITION_ENTER or
-                        Geofence.GEOFENCE_TRANSITION_EXIT or
-                        Geofence.GEOFENCE_TRANSITION_DWELL)
-            .build()
-    }
-
-    // Geofence 지정 및 관련 이벤트 트리거 방식을 설정하기 위해 GeofencingRequest 빌드
-    // INITIAL_TRIGGER_ENTER를 지정하면 기기가 이미 지오펜싱 내부에 있는 경우 GEOFENCE_TRANSITION_ENTER를
-    // 트리거해야 한다고 위치 서비스에 알림
-    private fun getGeofencingRequest(list:List<Geofence>): GeofencingRequest {
-        return GeofencingRequest.Builder().apply {
-            // Geofence 이벤트는 진입시부터 처리할 때
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER or
-                    GeofencingRequest.INITIAL_TRIGGER_DWELL or
-                    GeofencingRequest.INITIAL_TRIGGER_EXIT)
-            addGeofences(list)  // Geofence 리스트 추가
-        }.build()
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun addGeofences() {
-        CheckPermission()
-        geofencingClient.addGeofences(getGeofencingRequest(todayGeofenceList),geofencePendingIntent).run {
-            addOnSuccessListener {
-                Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "추가 후 지오펜싱 리스트 : ${todayGeofenceList}")
-            }
-            addOnFailureListener {
-                Toast.makeText(this@MainActivity, "add Fail", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    // TODO 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
-    // 매일 상태를 리셋할 함수
-    private fun resetworkManager() {
-        val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
-                .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)    // 초기 지연 설정
-            .addTag("Reset")
-            .build()
-
-        WorkManager.getInstance(this).enqueue(dailyResetRequeset)
-
-
-
-    }
-
-    // 실행 지연 시간을 설정하는 함수
-    fun getTimeUsingInWorkRequest() : Long {
-        val currentDate = Calendar.getInstance()
-        val dueDate = Calendar.getInstance()
-
-        dueDate.set(Calendar.HOUR_OF_DAY, 3)
-        dueDate.set(Calendar.MINUTE, 0)
-        dueDate.set(Calendar.SECOND, 0)
-
-        if(dueDate.before(currentDate)) {
-            dueDate.add(Calendar.HOUR_OF_DAY, 24)
-        }
-
-        return dueDate.timeInMillis - currentDate.timeInMillis
-    }
-
-    fun deleteFromDB(ID: String) {
-
-        realm.beginTransaction()
-
-        var result = realm.where<Todo>().equalTo("id",ID).findFirst()
-        if (result != null) {
-            Log.d(ContentValues.TAG, "삭제 result : $result")
-            result.deleteFromRealm()
-        }
-
-        realm.commitTransaction()
-
-    }
-
-    // 현제 위치
-    private fun whenUpdateLocation() {
-        mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        mLocationListener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-                var lat = 0.0
-                var lng = 0.0
-                if (location != null) {
-                    lat = location.latitude
-                    lng = location.longitude
-                    Log.d("로그", " 현재 위치는 $lat , $lng ")
-                }
-            }
-        }
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
-        mLocationManager!!.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            3000L,
-            30f, mLocationListener as LocationListener
-        )
-    }
-
-    // 오늘 날짜의 지오펜싱
-    private fun findTodayGeofence() {
-        geofenceList.forEach {
-            if (it.requestId.substring(0,8) == today_date) {
-                todayGeofenceList.add(it)
-            }
-        }
-    }
-
-
-
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        realm.close()   // 인스턴스 해제
     }
 
 

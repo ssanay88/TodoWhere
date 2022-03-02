@@ -8,12 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.RecyclerView
-import com.example.todowhere.data.Todo
+import com.example.todowhere.RealmDB.Todo
 import com.scwang.wave.MultiWaveHeader
 import io.realm.Realm
-import org.jetbrains.anko.backgroundColor
 
 // 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
 class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -179,7 +177,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         fun bind() {
             // 추가 버튼 클릭 시 작동
             addBtn.setOnClickListener {
-                Log.d(TAG,"일정 추가 버튼 클릭!!")
+
                 if (addListener == null) {
                     Log.d(TAG,"addListener이 null 입니다.")
                 } else {

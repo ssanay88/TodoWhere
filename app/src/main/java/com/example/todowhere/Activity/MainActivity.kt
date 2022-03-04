@@ -344,7 +344,6 @@ class MainActivity : AppCompatActivity() {
                 // Log.d(TAG,"어댑터에 알리는 중입니당")
             }
         }
-
     }
 
     // 날짜를 원하는 8자리로 만들어주는 함수
@@ -503,7 +502,7 @@ class MainActivity : AppCompatActivity() {
         // 지오펜싱 삭제
         var geofencingResult = realm.where<Geofencing>().equalTo("id",ID).findFirst()
         if (geofencingResult != null) {
-            Log.d(ContentValues.TAG, "삭제 지오펜싱 : $todoResult")
+            Log.d(ContentValues.TAG, "삭제 지오펜싱 : $geofencingResult")
             geofencingResult.deleteFromRealm()
         }
 

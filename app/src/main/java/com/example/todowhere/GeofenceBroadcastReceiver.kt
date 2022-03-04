@@ -5,19 +5,18 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import com.example.todowhere.RealmDB.Todo
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import io.realm.Realm
+import io.realm.kotlin.where
 import java.util.*
 
 // appState : 일정 측정을 시작했는지 확인하는 변수 , todayTodo : 오늘 날짜에 해당하는 DB만 리스트로 가져옴
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     var TAG: String = "로그"
-
-
-    var progressingGeofences : MutableList<Geofence> = mutableListOf()
 
     val calendar: Calendar = Calendar.getInstance()    // 오늘 날짜로 캘린더 객체 생성
     var today_date = getDate(
@@ -27,11 +26,6 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     )    // 오늘 날짜 8자리로 표현
 
     val realm = Realm.getDefaultInstance()    // realm 기본 인스턴스 얻기기
-
-    private var timerTask: Timer? = null    // 타이머 사용을 위한 타이머 태스크 선언언
-
-
-    // private val geofenceCountDownTimer:CountDownTimer = object : CountDownTimer()    // 목표 시간동안 카운트 다운을 진행할 변수
 
     override fun onReceive(context: Context, intent: Intent) {
 
@@ -64,26 +58,12 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
             // 진행되고 있는 지오펜스에 추가
             triggeringGeofences.forEach {
-
-                // Enter Or Dwell인 경우 타이머 시작작
-
-               Log.d(TAG,"${it.requestId}")
-            }
-
-//                // 1초마다 진행할 것
-//                timerTask = kotlin.concurrent.timer(period = 1000) {
-//                    // 진행 중인 지오펜싱 리스트 중에서 하나씩 시간 감소
-//                    progressingGeofences.forEach {
-//                        realm.beginTransaction()    // realm 트랜잭션 시작
-//
-//                        var realmResult =
-//                            realm.where<Todo>().contains("id", it.requestId).findFirst()
-//                        // 해당 realm 데이터의 시간 감소
-//                        realmResult!!.time -= 1
-//
-//                        realm.commitTransaction()   // realm 트랜잭션 종료
-//                    }
-//                }
+                // Enter Or Dwell인 경우 DB의 상태 진행중으로 변경
+                realm.beginTransaction()
+                var realmResult = realm.where<Todo>().contains("id", it.requestId).findFirst()
+                realmResult!!.state = "Doing"    // 진행중으로 변경
+                realm.commitTransaction()
+                }
             }
 
             // 지오펜싱 밖으로 사용자가 나갈떄 -> 타이머 중지지
@@ -93,18 +73,16 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 val triggeringGeofences = geofencingEvent.triggeringGeofences
 
                 triggeringGeofences.forEach {
-
-                    Log.d(TAG,"${it.requestId}")
+                    // Enter Or Dwell인 경우 DB의 상태 진행중으로 변경
+                    realm.beginTransaction()
+                    var realmResult = realm.where<Todo>().contains("id", it.requestId).findFirst()
+                    realmResult!!.state = "Stop"    // 진행중으로 변경
+                    realm.commitTransaction()
                 }
             }
-//        timerTask?.cancel()
+
 
     }
-
-    private fun updateUi() {
-
-    }
-
 
     // 날짜를 원하는 8자리로 만들어주는 함수
     private fun getDate(year: Int, month: Int, day: Int): String {

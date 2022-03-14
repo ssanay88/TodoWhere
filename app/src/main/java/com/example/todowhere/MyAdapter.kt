@@ -139,11 +139,12 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // 아이템 상태가 완료일 경우 버튼에 완료 표시
             if (item.state == "Done") {
                 timerTextView.text = "완료"
-                doingEffect.stop()
+                doingEffect.start()
 
             } else {
                 timerTextView.text = HourMin(item.time)    // item.time.toString()
                 doingEffect.start()
+
             }
 
 

@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit
 할일추가시 현재 위치로 설정되어 있지 않음 - 해결
 
 지오 펜싱 작동 유무 재확인 + 지오펜싱 작동 시 UI에서 알려주는 객체 필요 - waveView로 표시
--> 지오 펜싱 작동 시 상호 작용 변경중 2022 - 02 - 10 , Geofencing이 실행되지 않는다.
+-> 지오 펜싱 작동 시 상호 작용 변경중 2022 - 02 - 10 , Geofencing이 실행되지 않는다. - 해결
 
 ResetWorker 다시 코딩
 
@@ -121,6 +121,7 @@ class MainActivity : AppCompatActivity() {
         resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
+        ChangeTimeThread()    // runOnUIThread로 아이템 시간 변화주기
 
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
@@ -157,8 +158,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        // runOnUIThread로 아이템 시간 변화주기
-        ChangeTimeThread()
+
 
         // 날짜 선택 후 일정 추가 버튼 클릭 시 yyyyMMdd 형태로 전달
         myAdapter.setOnAddBtnClickListener(object : MyAdapter.OnAddBtnClickListener {
@@ -335,6 +335,16 @@ class MainActivity : AppCompatActivity() {
 
     // 0.5초마다 어댑터에 변화 감지
     private fun ChangeTimeThread() {
+
+        val runnable = Runnable {
+            // 매초 "Doing"인 상태의 할 일을 카운트
+            var realmResult = realm.where<Todo>().equalTo("tate","Doing").findAll()
+
+
+
+
+
+        }
 
         // 0.5초마다 반복
         timerTask = kotlin.concurrent.timer(period = 500) {

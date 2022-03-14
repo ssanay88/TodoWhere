@@ -307,13 +307,13 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             newItem.what = addTodoBinding.whatTodo.editText?.text.toString()
             // 목표 달성 시간 넣어주기
             newItem.time = goal_time.toLong()
-            // 지도에서 받아온 목표 범위위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가 -> 중심 좌표를 등록하는것으로 정리
+            // 지도에서 받아온 목표 범위 넣어주기 , 0701 Realm DB에 LatLngBounds는 사용 불가 -> 중심 좌표를 등록하는것으로 정리
             newItem.center_lat = selected_Lat
             newItem.center_lng = selected_Lng
             // 리사이클뷰에서 보여줄 뷰홀더 변경
             newItem.view_type = 1
-            // 계획 달성 상황 설정
-            newItem.state = "Done"
+            // 계획 상황 설정
+            newItem.state = "Wait"
 
 
 

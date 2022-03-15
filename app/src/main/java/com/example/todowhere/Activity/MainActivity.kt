@@ -12,6 +12,7 @@ import android.location.LocationManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -63,6 +64,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var layout: LinearLayoutManager    // 리사이클러뷰 레이아웃
 
     private lateinit var timerTask: Timer    // 타이머에 사용할 TimerTask
+    private val timerHandler: Handler by lazy {
+        Handler()
+    }
 
 
     val todayGeofenceList : MutableList<Geofence> = mutableListOf()    // 오늘 작동할 Geofencing만 담은 리스트
@@ -121,7 +125,8 @@ class MainActivity : AppCompatActivity() {
         resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
-        ChangeTimeThread()    // runOnUIThread로 아이템 시간 변화주기
+        // ChangeTimeThread()    // runOnUIThread로 아이템 시간 변화주기
+        waitOneSencond()
 
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
@@ -332,28 +337,25 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun waitOneSencond() {
+        timerHandler.postDelayed(::ChangeTimeThread,1000)
+
+    }
 
     // 0.5초마다 어댑터에 변화 감지
     private fun ChangeTimeThread() {
 
-        val runnable = Runnable {
-            // 매초 "Doing"인 상태의 할 일을 카운트
-            var realmResult = realm.where<Todo>().equalTo("tate","Doing").findAll()
-
-
-
-
-
+        // 매초 "Doing"인 상태의 할 일을 카운트
+        var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
+        realmResult.forEach {
+            it.time -= 1
+            Log.d(TAG,"시간 : ${it.time}")
         }
+        Log.d(TAG,"실행 주우웅")
 
-        // 0.5초마다 반복
-        timerTask = kotlin.concurrent.timer(period = 500) {
-            // UI조작을 위한 메서드
-            runOnUiThread {
-                myAdapter.notifyDataSetChanged()
-                // Log.d(TAG,"어댑터에 알리는 중입니당")
-            }
-        }
+
+        myAdapter.notifyDataSetChanged()
+        waitOneSencond()
     }
 
     // 날짜를 원하는 8자리로 만들어주는 함수

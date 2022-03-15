@@ -207,6 +207,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(naverMap : NaverMap) {
 
         this.naverMap = naverMap
+        naverMap.minZoom = 11.0
+        naverMap.maxZoom = 18.0
 
 
         // 현재 위치를 받아온다.
@@ -369,6 +371,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                 circle.outlineColor = GREEN
                 circle.color = 0
                 circle.map = naverMap
+
 
             }
         }

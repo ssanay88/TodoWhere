@@ -61,7 +61,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 // Enter Or Dwell인 경우 DB의 상태 진행중으로 변경
                 realm.beginTransaction()
                 var realmResult = realm.where<Todo>().contains("id", it.requestId).findFirst()
-                realmResult!!.state = "Doing"    // 진행중으로 변경
+                realmResult?.state = "Doing"    // 진행중으로 변경
                 realm.commitTransaction()
                 }
             }

@@ -60,8 +60,10 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             triggeringGeofences.forEach {
                 // Enter Or Dwell인 경우 DB의 상태 진행중으로 변경
                 realm.beginTransaction()
-                var realmResult = realm.where<Todo>().contains("id", it.requestId).findFirst()
+                var realmResult = realm.where<Todo>().contains("id", "${it.requestId}").findFirst()
                 realmResult?.state = "Doing"    // 진행중으로 변경
+                Log.d(TAG,"${it.requestId}")
+                Log.d(TAG,"$realmResult")
                 realm.commitTransaction()
                 }
             }
@@ -75,7 +77,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 triggeringGeofences.forEach {
                     // Enter Or Dwell인 경우 DB의 상태 진행중으로 변경
                     realm.beginTransaction()
-                    var realmResult = realm.where<Todo>().contains("id", it.requestId).findFirst()
+                    var realmResult = realm.where<Todo>().contains("id", "${it.requestId}").findFirst()
                     realmResult!!.state = "Stop"    // 진행중으로 변경
                     realm.commitTransaction()
                 }

@@ -204,8 +204,10 @@ class MainActivity : AppCompatActivity() {
                     .setTitle("일정 삭제")
                     .setMessage("해당 일정을 정말로 삭제하시겠습니까?")
                     .setPositiveButton("삭제",{ _,_ ->
-                        // Todo DB에서 해당 일정 삭제
+                        // DB에서 삭제 및 지오펜싱 삭제
                         deleteFromDB(todo.id)
+                        // TODO 지오펜싱 리스트에서 지오펜스 또한 삭제해야한다.
+                        // deleteGeofencing(todo)
 
                         // Adapter에 변화된 realm 값들을 적용시켜줘야한다.
                         myAdapter.todo_datas =
@@ -347,11 +349,12 @@ class MainActivity : AppCompatActivity() {
 
         // 매초 "Doing"인 상태의 할 일을 카운트
         var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
+        Log.d(TAG,"진행 중인 realm : $realmResult")
         realmResult.forEach {
             it.time -= 1
             Log.d(TAG,"시간 : ${it.time}")
         }
-        Log.d(TAG,"실행 주우웅")
+        // Log.d(TAG,"실행 주우웅")
 
 
         myAdapter.notifyDataSetChanged()
@@ -519,6 +522,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         realm.commitTransaction()
+
+    }
+
+    fun deleteGeofencing(todo: Todo) {
+
+        // todayGeofenceList.remove(Geofence.requestId)
 
     }
 

@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
         // ChangeTimeThread()    // runOnUIThread로 아이템 시간 변화주기
-        waitOneSencond()
+
 
 
         // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
@@ -280,6 +280,8 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        waitOneSencond()    // 타이머 실행
+
     }
 
 
@@ -329,6 +331,8 @@ class MainActivity : AppCompatActivity() {
             addGeofences()    // geofencing 추가
         }
 
+        waitOneSencond()    // 타이머 실행
+
     }
 
 
@@ -340,6 +344,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun waitOneSencond() {
+
         timerHandler.postDelayed(::ChangeTimeThread,1000)
 
     }
@@ -347,14 +352,20 @@ class MainActivity : AppCompatActivity() {
     // 0.5초마다 어댑터에 변화 감지
     private fun ChangeTimeThread() {
 
-        // 매초 "Doing"인 상태의 할 일을 카운트
+        realm.beginTransaction()
+
+        // 매초 "Doing"인 상태의 할 일을 카운트    equalTo("id",today_date).
         var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
         Log.d(TAG,"진행 중인 realm : $realmResult")
         realmResult.forEach {
-            it.time -= 1
+            var nowTime = it.time
+            nowTime -= 1
+            it.time = nowTime
             Log.d(TAG,"시간 : ${it.time}")
         }
         // Log.d(TAG,"실행 주우웅")
+
+        realm.commitTransaction()
 
 
         myAdapter.notifyDataSetChanged()

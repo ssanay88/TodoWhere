@@ -13,6 +13,8 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -36,6 +38,7 @@ import io.realm.kotlin.where
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.timer
 
 /*
 <수정 요청> 2022 - 02 - 06
@@ -63,9 +66,35 @@ class MainActivity : AppCompatActivity() {
     private lateinit var myAdapter: MyAdapter    // 리사이클러뷰 어댑터
     private lateinit var layout: LinearLayoutManager    // 리사이클러뷰 레이아웃
 
-    private lateinit var timerTask: Timer    // 타이머에 사용할 TimerTask
-    private val timerHandler: Handler by lazy {
-        Handler()
+    // private val mTimer = Timer()    // 타이머 객체 생성
+    // 타이머에 사용할 TimerTask
+//    private val timerTask: TimerTask = object :  TimerTask() {
+//        override fun run() {
+//            timerHandler.sendEmptyMessage(0)
+//        }
+//    }
+
+    private var timerTask : Timer? = null
+    private val timerHandler: Handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            // 진행할 내용
+            realm.beginTransaction()
+
+            // 매초 "Doing"인 상태의 할 일을 카운트    equalTo("id",today_date).
+            var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
+            Log.d(TAG,"진행 중인 realm : $realmResult")
+            realmResult.forEach {
+                var nowTime = it.time
+                nowTime -= 1
+                it.time = nowTime
+                Log.d(TAG,"시간 : ${it.time}")
+            }
+            // Log.d(TAG,"실행 주우웅")
+
+            realm.commitTransaction()
+
+            myAdapter.notifyDataSetChanged()
+        }
     }
 
 
@@ -125,7 +154,8 @@ class MainActivity : AppCompatActivity() {
         resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
-        // ChangeTimeThread()    // runOnUIThread로 아이템 시간 변화주기
+        // mTimer.schedule(timerTask,1000)    // 타이머 진행
+        startTimer()    // 타이머 진행
 
 
 
@@ -280,8 +310,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        waitOneSencond()    // 타이머 실행
-
     }
 
 
@@ -331,7 +359,6 @@ class MainActivity : AppCompatActivity() {
             addGeofences()    // geofencing 추가
         }
 
-        waitOneSencond()    // 타이머 실행
 
     }
 
@@ -342,35 +369,37 @@ class MainActivity : AppCompatActivity() {
         realm.close()   // 인스턴스 해제
     }
 
+    private fun startTimer() {
+        timerTask?.cancel()    // null이 아닐 경우 취소하고 실행
+        timerTask = timer(period = 1000) {
+            runOnUiThread {
 
-    private fun waitOneSencond() {
+                // 진행할 내용
+                realm.beginTransaction()
 
-        timerHandler.postDelayed(::ChangeTimeThread,1000)
+                // 매초 "Doing"인 상태의 할 일을 카운트    equalTo("id",today_date).
+                var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
+                Log.d(TAG,"진행 중인 realm : $realmResult")
+                realmResult.forEach {
+                    var nowTime = it.time
+                    nowTime -= 1
+                    it.time = nowTime
 
-    }
+                    // 0초가 되면 종료
+                    if (nowTime == 0L) {
+                        it.state = "Done"
+                    }
+                }
 
-    // 0.5초마다 어댑터에 변화 감지
-    private fun ChangeTimeThread() {
+                realm.commitTransaction()
 
-        realm.beginTransaction()
+                myAdapter.notifyDataSetChanged()    // 어댑터에 적용
+            }
 
-        // 매초 "Doing"인 상태의 할 일을 카운트    equalTo("id",today_date).
-        var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
-        Log.d(TAG,"진행 중인 realm : $realmResult")
-        realmResult.forEach {
-            var nowTime = it.time
-            nowTime -= 1
-            it.time = nowTime
-            Log.d(TAG,"시간 : ${it.time}")
         }
-        // Log.d(TAG,"실행 주우웅")
-
-        realm.commitTransaction()
-
-
-        myAdapter.notifyDataSetChanged()
-        waitOneSencond()
     }
+
+
 
     // 날짜를 원하는 8자리로 만들어주는 함수
    fun getDate(year : Int , month : Int , day : Int) : String {

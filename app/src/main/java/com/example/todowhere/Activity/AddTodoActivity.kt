@@ -315,7 +315,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             // 리사이클뷰에서 보여줄 뷰홀더 변경
             newItem.view_type = 1
             // 계획 상황 설정
-            newItem.state = "Wait"
+            newItem.state = "Doing"
 
 
 

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todowhere.RealmDB.Todo
 import com.scwang.wave.MultiWaveHeader
 import io.realm.Realm
+import org.jetbrains.anko.backgroundColor
 
 // 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
 class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -137,16 +138,29 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
             // Realm 에서 데이터 불러와서 적용
             todoTextView.text = item.what
             // 아이템 상태가 완료일 경우 버튼에 완료 표시
-            if (item.state == "Done") {
-                timerTextView.text = "완료"
-                doingEffect.stop()
+            when (item.state) {
 
-            } else {
+                "Doing" -> {
+                    timerTextView.text = HourMin(item.time)    // item.time.toString()
+                    doingEffect.start()
+                }
+                "Stop","Wait" -> {
+                    timerTextView.text = HourMin(item.time)
+                    doingEffect.stop()
+                }
+                "Done" -> {
+                    timerTextView.text = "완료"
+                    doingEffect.stop()
+                }
+                "Finish" -> {
+                    timerTextView.text = "실패"
+                    doingEffect.stop()
+                }
 
-                timerTextView.text = HourMin(item.time)    // item.time.toString()
-                doingEffect.start()
+
 
             }
+
 
 
             mapBtn.setOnClickListener {

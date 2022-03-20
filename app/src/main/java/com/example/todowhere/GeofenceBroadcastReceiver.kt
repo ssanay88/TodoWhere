@@ -35,6 +35,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         Toast.makeText(context,"지오펜싱 시작", Toast.LENGTH_SHORT).show()
 
 
+
         if (geofencingEvent.hasError()) {
             val errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.errorCode)
             Log.e("GeofenceBR", errorMessage)
@@ -60,10 +61,15 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             triggeringGeofences.forEach {
                 // Enter Or Dwell인 경우 DB의 상태 진행중으로 변경
                 realm.beginTransaction()
-                var realmResult = realm.where<Todo>().contains("id", it.requestId.toString()).findFirst()    // 왜 못찾는가
+
+                var AllrealmResult = realm.where<Todo>().contains("id",today_date).findAll()
+                Log.d(TAG,"전체 realm : $AllrealmResult")
+
+                // 왜 못찾는가 -> 아이디가 다르게 저장되고 있다
+                var realmResult = realm.where<Todo>().equalTo("id", it.requestId).findFirst()
                 realmResult?.state = "Doing"    // 진행중으로 변경
-                Log.d(TAG,"${it.requestId}")
-                Log.d(TAG,"$realmResult")
+                Log.d(TAG,"실행 ID : ${it.requestId}")
+                Log.d(TAG,"해당 realm : $realmResult")
                 realm.commitTransaction()
                 }
             }
@@ -79,9 +85,13 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                     realm.beginTransaction()
                     var realmResult = realm.where<Todo>().contains("id", it.requestId.toString()).findFirst()
                     realmResult?.state = "Stop"    // 진행중으로 변경
+                    Log.d(TAG,"정지 ID : ${it.requestId}")
+                    Log.d(TAG,"해당 realm : $realmResult")
                     realm.commitTransaction()
                 }
             }
+
+
 
 
     }

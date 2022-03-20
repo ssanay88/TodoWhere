@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import com.example.todowhere.BuildConfig
 import com.example.todowhere.DTO.GetAllDto
 import com.example.todowhere.R
+import com.example.todowhere.RealmDB.Geofencing
 import com.example.todowhere.ReverseGeocodingService
 import com.example.todowhere.RealmDB.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
@@ -128,11 +129,12 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 등록 버튼 클릭 시 해당 데이터 등록
         addTodoBinding.AddButton.setOnClickListener {
             if (insertTodo() == true) {
+                insertGeofencing()    // 지오펜싱도 추가
                 var next_intent = Intent(this, MainActivity::class.java).apply {
                     // 좌표의 위도, 경도 전송
-                    putExtra("Lat", selected_Lat)
-                    putExtra("Lng", selected_Lng)
-                    putExtra("Time", goal_time)
+//                    putExtra("Lat", selected_Lat)
+//                    putExtra("Lng", selected_Lng)
+//                    putExtra("Time", goal_time)
                 }
                 startActivity(next_intent)
             } else {
@@ -315,7 +317,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             // 리사이클뷰에서 보여줄 뷰홀더 변경
             newItem.view_type = 1
             // 계획 상황 설정
-            newItem.state = "Doing"
+            newItem.state = "Wait"
 
 
 
@@ -328,6 +330,26 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             return true
         }
 
+    }
+
+    // Realm DB에 Geofencing을 추가
+    private fun insertGeofencing() {
+
+        add_geofence_DB(now_date+now_time,selected_Lat,selected_Lng)
+
+    }
+
+    // 새로 생성된 지오펜싱 데이터를 DB에 추가
+    private fun add_geofence_DB(geofencingId: String, savedLat: Double, savedLng: Double) {
+
+        realm.beginTransaction()    // 트랜잭션 시작
+
+        // 객체 생성
+        val newGeofencing = realm.createObject<Geofencing>(geofencingId)
+        newGeofencing.lat = savedLat    // 위도 설정
+        newGeofencing.lng = savedLng    // 경도 설정
+
+        realm.commitTransaction()    // 트랜잭션 종료 및 반영영
     }
 
     // 유저의 현재 위치를 반환하는 함수

@@ -66,37 +66,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var myAdapter: MyAdapter    // 리사이클러뷰 어댑터
     private lateinit var layout: LinearLayoutManager    // 리사이클러뷰 레이아웃
 
-    // private val mTimer = Timer()    // 타이머 객체 생성
-    // 타이머에 사용할 TimerTask
-//    private val timerTask: TimerTask = object :  TimerTask() {
-//        override fun run() {
-//            timerHandler.sendEmptyMessage(0)
-//        }
-//    }
-
     private var timerTask : Timer? = null
-    private val timerHandler: Handler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            // 진행할 내용
-            realm.beginTransaction()
-
-            // 매초 "Doing"인 상태의 할 일을 카운트    equalTo("id",today_date).
-            var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
-            Log.d(TAG,"진행 중인 realm : $realmResult")
-            realmResult.forEach {
-                var nowTime = it.time
-                nowTime -= 1
-                it.time = nowTime
-                Log.d(TAG,"시간 : ${it.time}")
-            }
-            // Log.d(TAG,"실행 주우웅")
-
-            realm.commitTransaction()
-
-            myAdapter.notifyDataSetChanged()
-        }
-    }
-
 
     val todayGeofenceList : MutableList<Geofence> = mutableListOf()    // 오늘 작동할 Geofencing만 담은 리스트
 
@@ -134,12 +104,6 @@ class MainActivity : AppCompatActivity() {
     var cur_time_form: String = SimpleDateFormat("HHmmss").format(cur_time)!! // 현재 시간을 원하는 형태로 변경
 
 
-    // Geofencing 객체를 만들기 위해 AddTodoActivity에서 불러온 좌표값 , 목표 달성 시간
-    var saved_Lat : Double = 0.0
-    var saved_Lng : Double = 0.0
-    var saved_time : Int = 0
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,17 +118,7 @@ class MainActivity : AppCompatActivity() {
         resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
-        // mTimer.schedule(timerTask,1000)    // 타이머 진행
         startTimer()    // 타이머 진행
-
-
-
-        // AddTodoActivity 에서 인텐트를 전달받기 위해 선언
-        var intent_from_addtodoactivity = getIntent()
-
-        // AddTodoActivity 에서 선택한 좌표값들 선언언
-        saved_Lat = intent_from_addtodoactivity.getDoubleExtra("Lat",0.0)
-        saved_Lng = intent_from_addtodoactivity.getDoubleExtra("Lng",0.0)
 
 
         selected_date = getDate(selected_year,selected_month,selected_day)
@@ -177,8 +131,6 @@ class MainActivity : AppCompatActivity() {
         if (realmResult.size == 0 ) {
             add_blank_data(selected_date)
         }
-
-
 
 
         // 리사이클러뷰 관련 선언
@@ -344,22 +296,17 @@ class MainActivity : AppCompatActivity() {
         // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
         myAdapter.Item = find_Item_Count(selected_date)
 
-        // adapter에게 Data가 변했다는 것을 알려줍니다.
-        myAdapter.notifyDataSetChanged()
-
-
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
         // 새로운 좌표를 입력 받은 경우만 추가
-        if (saved_Lat != 0.0 && saved_Lng != 0.0) {
-            add_geofence_DB(selected_date+cur_time_form,saved_Lat,saved_Lng)
-            getTodayGeofencing()
 
-            // TODO
+        getTodayGeofencing()
+        if (todayGeofenceList.isNotEmpty()) {
             addGeofences()    // geofencing 추가
         }
 
-
+        // adapter에게 Data가 변했다는 것을 알려줍니다.
+        myAdapter.notifyDataSetChanged()
     }
 
 
@@ -378,15 +325,15 @@ class MainActivity : AppCompatActivity() {
                 realm.beginTransaction()
 
                 // 매초 "Doing"인 상태의 할 일을 카운트    equalTo("id",today_date).
-                var realmResult = realm.where<Todo>().equalTo("state","Doing").findAll()
-                Log.d(TAG,"진행 중인 realm : $realmResult")
+                var realmResult = realm.where<Todo>().equalTo("state","Doing").contains("id",today_date).findAll()
+                // Log.d(TAG,"진행 중인 realm : $realmResult")
                 realmResult.forEach {
                     var nowTime = it.time
                     nowTime -= 1
                     it.time = nowTime
 
                     // 0초가 되면 종료
-                    if (nowTime == 0L) {
+                    if (nowTime <= 0L && it.state != "Done") {
                         it.state = "Done"
                     }
                 }
@@ -444,19 +391,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    // 새로 생성된 지오펜싱 데이터를 DB에 추가
-    private fun add_geofence_DB(geofencingId: String, savedLat: Double, savedLng: Double) {
-        realm.beginTransaction()    // 트랜잭션 시작
-
-        // 객체 생성
-        val newGeofencing = realm.createObject<Geofencing>(geofencingId)
-        newGeofencing.lat = savedLat    // 위도 설정
-        newGeofencing.lng = savedLng    // 경도 설정
-
-        realm.commitTransaction()    // 트랜잭션 종료 및 반영영
-    }
-
-
     // 지오펜스 객체를 생성하는 함수
     private fun getGeofence(reqId:String , geo:Pair<Double,Double>, radius:Float = 50f, time:Long):Geofence {
         return Geofence.Builder()
@@ -500,6 +434,7 @@ class MainActivity : AppCompatActivity() {
 
     // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들을 리스트에 추가하는 함수
     private fun getTodayGeofencing() {
+
         val realmResult = realm.where<Geofencing>().contains("id",today_date).findAll()
 
         realmResult.forEach {

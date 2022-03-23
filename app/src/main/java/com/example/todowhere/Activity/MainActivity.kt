@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
 
         CheckPermission()    // 위치 권환 요청
-        resetworkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
+        resetWorkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
         startTimer()    // 타이머 진행
@@ -452,7 +452,9 @@ class MainActivity : AppCompatActivity() {
 
     // TODO 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
     // 매일 상태를 리셋할 함수
-    private fun resetworkManager() {
+    // 함수를 통해 ResetWorker를 호출하는 요청을 보내고 , ResetWorker안에서 자기 자신을 다시 호출하는
+    // OneTimeWorkRequestBuilder를 요청하여 매일 반복하도록 한다.
+    private fun resetWorkManager() {
         val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
                 .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)    // 초기 지연 설정
             .addTag("Reset")
@@ -463,6 +465,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 실행 지연 시간을 설정하는 함수
+    // OneTimeWorkRequest를 등록할 때마다, 아래 함수의 리턴값만큼 대기한 이후부터 시작하도록 하기 위해 사용
     fun getTimeUsingInWorkRequest() : Long {
         val currentDate = Calendar.getInstance()
         val dueDate = Calendar.getInstance()

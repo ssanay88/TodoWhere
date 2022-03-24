@@ -32,6 +32,11 @@ class ResetWorker(context: Context , workerparams:WorkerParameters) : CoroutineW
     var TAG: String = "로그"
 
     private val wContext = context
+    private val calendar: Calendar = Calendar.getInstance()
+
+    var nowYear = calendar.get(Calendar.YEAR)
+    var nowMonth = calendar.get(Calendar.MONTH) + 1
+    var nowDay = calendar.get(Calendar.DAY_OF_MONTH)
 
     // WorkManager에서 제공하는 백그라운드 스레드에서 비동기적으로 실행
     // doWork에서 반환되는 Result는 작업이 성공적인지 아닌지 판단 , 실패일 경우 WorkManager에 작업을 재실행해야하는지 알려줌
@@ -46,6 +51,7 @@ class ResetWorker(context: Context , workerparams:WorkerParameters) : CoroutineW
        WorkManager.getInstance(applicationContext).enqueue(dailyWorkRequest)
 
         // Todo 매일 반복해야할 행동
+
 
        Result.success()
     }

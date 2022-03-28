@@ -2,8 +2,10 @@ package com.example.todowhere.Activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -342,7 +344,6 @@ class MainActivity : AppCompatActivity() {
 
                 myAdapter.notifyDataSetChanged()    // 어댑터에 적용
             }
-
         }
     }
 
@@ -450,10 +451,31 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // TODO 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
+    // TODO 22.03.28 - AlarmManager로 실행시키도록 변경) 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
     // 매일 상태를 리셋할 함수
     // 함수를 통해 ResetWorker를 호출하는 요청을 보내고 , ResetWorker안에서 자기 자신을 다시 호출하는
     // OneTimeWorkRequestBuilder를 요청하여 매일 반복하도록 한다.
+
+    // 3시에 리셋시키는 알람매니저 등록
+    private fun resetAt3AM() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager    // 알람매니져 객체 생성
+        val intent = Intent(this,ResetBroadcastReceiver::class.java)    // BroadcastReceiver를 불러올 인텐트
+        // 선언한 인테트를 불러올 Pending Intent
+        val pendingIntent = PendingIntent.getBroadcast(this, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // 정시에 실행하고 반복하는 명령
+        // Inexcat -> 정확하지 않다 , 즉 정확하진 않지만 반복적으로 알람이 제공되는 명령
+        // 해당 메소드는 OS가 잠자기 모드에 들어가도 실행되지않고 정확하지 않기 때문에 현 예제에서 참고용으로만 쓰인다.
+        // alarmManager.setAndAllowWhileIdle()  *잠자기 모드에서도 정확한 alarmManager 조건을 탐지하는 메소드
+        // alarmManager.setExactAndAllowWhileIdle()
+        alarmManager.setInexactRepeating(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
+    }
+
     private fun resetWorkManager() {
         val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
                 .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)    // 초기 지연 설정
@@ -645,6 +667,10 @@ class MainActivity : AppCompatActivity() {
         val dialog = builder.create()
         dialog.show()
 
+    }
+
+    companion object {
+        private const val ALARM_REQUEST_CODE = 1000
     }
 
 

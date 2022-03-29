@@ -463,6 +463,13 @@ class MainActivity : AppCompatActivity() {
         // 선언한 인테트를 불러올 Pending Intent
         val pendingIntent = PendingIntent.getBroadcast(this, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
+        // 3:00 AM에 초기화
+        val resetCalendar: Calendar = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+            set(Calendar.HOUR_OF_DAY, 3)
+            set(Calendar.MINUTE, 0)
+        }
+
         // 정시에 실행하고 반복하는 명령
         // Inexcat -> 정확하지 않다 , 즉 정확하진 않지만 반복적으로 알람이 제공되는 명령
         // 해당 메소드는 OS가 잠자기 모드에 들어가도 실행되지않고 정확하지 않기 때문에 현 예제에서 참고용으로만 쓰인다.
@@ -470,7 +477,7 @@ class MainActivity : AppCompatActivity() {
         // alarmManager.setExactAndAllowWhileIdle()
         alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
+            resetCalendar.timeInMillis,
             AlarmManager.INTERVAL_DAY,
             pendingIntent
         )

@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         LocationServices.getGeofencingClient(this)
     }
 
+
     // BroadcastReceiver를 시작하는 PendingIntent 정의
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
@@ -119,8 +120,9 @@ class MainActivity : AppCompatActivity() {
         CheckPermission()    // 위치 권환 요청
         resetWorkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
         whenUpdateLocation()    // 위치가 업데이트될 때
-        getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가가
+        getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가
         startTimer()    // 타이머 진행
+        resetAt3AM()    // 매일 초기화 알람 실행
 
 
         selected_date = getDate(selected_year,selected_month,selected_day)
@@ -191,7 +193,7 @@ class MainActivity : AppCompatActivity() {
                         // DB에서 삭제 및 지오펜싱 삭제
                         deleteFromDB(todo.id)
                         // TODO 지오펜싱 리스트에서 지오펜스 또한 삭제해야한다.
-                        // deleteGeofencing(todo)
+                        deleteGeofencing(todo)
 
                         // Adapter에 변화된 realm 값들을 적용시켜줘야한다.
                         myAdapter.todo_datas =
@@ -450,6 +452,16 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun deleteGeofencing(todo: Todo) {
+
+        val realmResult = realm.where<Geofencing>().equalTo("id",todo.id).findFirst()!!
+
+        var nowGeofence = getGeofence(realmResult.id,(Pair(realmResult.lat,realmResult.lng)),50f,Geofence.NEVER_EXPIRE)
+        todayGeofenceList.remove(nowGeofence)
+
+
+    }
+
 
     // TODO 22.03.28 - AlarmManager로 실행시키도록 변경) 오늘 날짜의 지오펜싱들을 전체 지오펜싱 리스트에서 찾아서 추가
     // 매일 상태를 리셋할 함수
@@ -458,10 +470,14 @@ class MainActivity : AppCompatActivity() {
 
     // 3시에 리셋시키는 알람매니저 등록
     private fun resetAt3AM() {
+
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager    // 알람매니져 객체 생성
-        val intent = Intent(this,ResetBroadcastReceiver::class.java)    // BroadcastReceiver를 불러올 인텐트
-        // 선언한 인테트를 불러올 Pending Intent
-        val pendingIntent = PendingIntent.getBroadcast(this, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        // BroadcastReceiver를 불러올 인텐트
+        val intent = Intent(this,ResetBroadcastReceiver::class.java).apply {
+            putExtra("yesterdayDate",today_date)
+        }
+        // 선언한 인테트를 불러올 Pending Intent , FLAG_UPDATE_CURRENT : 현재 PendingIntent를 유지하고, 대신 인텐트의 extra data는 새로 전달된 Intent로 교체
+        val resetPendingIntent = PendingIntent.getBroadcast(this, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // 3:00 AM에 초기화
         val resetCalendar: Calendar = Calendar.getInstance().apply {
@@ -479,7 +495,7 @@ class MainActivity : AppCompatActivity() {
             AlarmManager.RTC_WAKEUP,
             resetCalendar.timeInMillis,
             AlarmManager.INTERVAL_DAY,
-            pendingIntent
+            resetPendingIntent
         )
     }
 
@@ -526,17 +542,14 @@ class MainActivity : AppCompatActivity() {
         if (geofencingResult != null) {
             Log.d(ContentValues.TAG, "삭제 지오펜싱 : $geofencingResult")
             geofencingResult.deleteFromRealm()
+
         }
 
         realm.commitTransaction()
 
     }
 
-    fun deleteGeofencing(todo: Todo) {
 
-        // todayGeofenceList.remove(Geofence.requestId)
-
-    }
 
     // 현제 위치
     private fun whenUpdateLocation() {

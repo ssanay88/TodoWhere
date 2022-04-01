@@ -62,6 +62,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
 
+    private var doubleBackToExit = false    // 메인액티비티에서 종료시 판단하는 변수
+
     var mLocationManager: LocationManager? = null    // 위치 서비스에 접근하는 클래스를 제공
     var mLocationListener: LocationListener? = null    // 위치가 변할 때 LocationManager로부터 notification을 받는 용도
 
@@ -114,8 +116,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(mainBinding.root)
 
         Log.d(TAG,"onCreate() 시작")
-
-
 
         CheckPermission()    // 위치 권환 요청
         resetWorkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
@@ -313,7 +313,25 @@ class MainActivity : AppCompatActivity() {
         myAdapter.notifyDataSetChanged()
     }
 
+    // 뒤로가기 클릭 시
+    override fun onBackPressed() {
+        // 두번 뒤로 가기 클릭으로 종료 명령 시 종료
+        if (doubleBackToExit) {
+            finishAffinity()
+        } else {
+            Toast.makeText(this, "종료하시려면 뒤로가기를 한번 더 눌러주세요.", Toast.LENGTH_SHORT).show()
+            // 1.5초 사이에 뒤로 가기를 한번 더 누를 경우 위의 종료 명령 실행
+            doubleBackToExit = true
+            runDelayed(1500L) {
+                doubleBackToExit = false
+            }
+        }
+    }
 
+
+    fun runDelayed(millis: Long, function: () -> Unit) {
+        Handler(Looper.getMainLooper()).postDelayed(function, millis)
+    }
 
     override fun onDestroy() {
         super.onDestroy()

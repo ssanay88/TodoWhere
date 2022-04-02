@@ -118,18 +118,142 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG,"onCreate() 시작")
 
         CheckPermission()    // 위치 권환 요청
-        resetWorkManager()    // 매일 새벽 3시 모든 상태 초기화 및 지오펜싱 삭제
+
         whenUpdateLocation()    // 위치가 업데이트될 때
         getTodayGeofencing()    // 지오펜싱 DB에서 오늘 날짜의 지오펜싱들 추가
         startTimer()    // 타이머 진행
         resetAt3AM()    // 매일 초기화 알람 실행
+        initAdapter()    // 어댑터에 관한 설정
+        initCalendarView()    // 캘린더 뷰에 관한 설정
 
+
+
+    }
+
+
+
+
+    // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
+    override fun onResume() {
+        super.onResume()
+
+        Log.d(TAG,"onResume() 시작")
+        initCalendarView()    // 앱 재실행시 캘린더뷰 설정
+
+//        // 이거 없으면 클릭리스너 작동 X - 11.18
+//        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
+//
+//        var realmResult =
+//            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+//
+//        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+//        if (realmResult.size == 0 ) {
+//            add_blank_data(selected_date)
+//        }
+//
+//        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
+//        mainBinding.TodoRecyclerView.adapter = myAdapter
+//
+//
+//        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
+//        val layout = LinearLayoutManager(this)
+//        mainBinding.TodoRecyclerView.layoutManager = layout
+//
+//        myAdapter.todo_datas = realmResult
+//
+//        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+//        myAdapter.Item = find_Item_Count(selected_date)
+
+        /////// Geofencing 추가 코드 //////
+        // geofenceList에 새로 입력받은 값 추가
+        // 새로운 좌표를 입력 받은 경우만 추가
+
+        getTodayGeofencing()
+        if (todayGeofenceList.isNotEmpty()) {
+            addGeofences()    // geofencing 추가
+        }
+
+        // adapter에게 Data가 변했다는 것을 알려줍니다.
+        myAdapter.notifyDataSetChanged()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()   // 인스턴스 해제
+    }
+
+    // 뒤로가기 클릭 시
+    override fun onBackPressed() {
+        // 두번 뒤로 가기 클릭으로 종료 명령 시 종료
+        if (doubleBackToExit) {
+            finishAffinity()
+        } else {
+            Toast.makeText(this, "종료하시려면 뒤로가기를 한번 더 눌러주세요.", Toast.LENGTH_SHORT).show()
+            // 1.5초 사이에 뒤로 가기를 한번 더 누를 경우 위의 종료 명령 실행
+            doubleBackToExit = true
+            runDelayed(1500L) {
+                doubleBackToExit = false
+            }
+        }
+    }
+
+
+    fun runDelayed(millis: Long, function: () -> Unit) {
+        Handler(Looper.getMainLooper()).postDelayed(function, millis)
+    }
+
+    // 캘린더뷰에 관한 설정
+    private fun initCalendarView() {
 
         selected_date = getDate(selected_year,selected_month,selected_day)
 
+        mainBinding.CalendarView.setCurrentDate(Date(System.currentTimeMillis()))    // 오늘 날짜로 설정
+        mainBinding.CalendarView.setDateSelected(Date(System.currentTimeMillis()),true)    // 오늘 날짜 선택
 
+        // 캘린더뷰에서 날짜 선택 시 날짜 지정
+        mainBinding.CalendarView.setOnDateChangedListener { widget, date, selected ->   //{ view, year, month, dayOfMonth ->
+
+            // 날짜 선택 시 선택한 시간으로 갱신
+            cur_time = Date().time
+            cur_time_form = SimpleDateFormat("HHmmss").format(cur_time)
+
+            // 날짜 선택시 선택한 날짜로 갱신
+            selected_month = date.month + 1
+            selected_year = date.year
+            selected_day = date.day
+
+            // 선택한 날짜를 yyyyMMdd 형태로 변형
+            selected_date = getDate(selected_year,selected_month,selected_day)
+
+            // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
+            var realmResult = realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
+
+            if (realmResult.size == 0 ) {
+                add_blank_data(selected_date)
+            }
+
+            myAdapter.todo_datas = realmResult
+
+            // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+            myAdapter.Item = find_Item_Count(selected_date)
+
+            // adapter에게 Data가 변했다는 것을 알려줍니다.
+            myAdapter.notifyDataSetChanged()
+
+//            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
+//            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
+//            Log.d(TAG, "DB : $realmResult")
+
+            Log.d(TAG,"오늘의 지오펜싱 리스트 : $todayGeofenceList")
+
+        }
+
+    }
+
+
+    // 어댑터의 클릭 리스너 설정
+    private fun initAdapter() {
         var realmResult = realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-
 
         // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
         if (realmResult.size == 0 ) {
@@ -222,121 +346,8 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
-
-        mainBinding.CalendarView.setCurrentDate(Date(System.currentTimeMillis()))    // 오늘 날짜로 설정
-        mainBinding.CalendarView.setDateSelected(Date(System.currentTimeMillis()),true)    // 오늘 날짜 선택
-
-        // 캘린더뷰에서 날짜 선택 시 날짜 지정
-        mainBinding.CalendarView.setOnDateChangedListener { widget, date, selected ->   //{ view, year, month, dayOfMonth ->
-
-            // 날짜 선택 시 선택한 시간으로 갱신
-            cur_time = Date().time
-            cur_time_form = SimpleDateFormat("HHmmss").format(cur_time)
-
-            // 날짜 선택시 선택한 날짜로 갱신
-            selected_month = date.month + 1
-            selected_year = date.year
-            selected_day = date.day
-
-            // 선택한 날짜를 yyyyMMdd 형태로 변형
-            selected_date = getDate(selected_year,selected_month,selected_day)
-
-            // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
-            realmResult = realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-            Log.d(TAG,"$realmResult")
-
-            if (realmResult.size == 0 ) {
-                add_blank_data(selected_date)
-            }
-
-            myAdapter.todo_datas = realmResult
-
-            // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
-            myAdapter.Item = find_Item_Count(selected_date)
-
-            // adapter에게 Data가 변했다는 것을 알려줍니다.
-            myAdapter.notifyDataSetChanged()
-
-//            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
-//            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
-//            Log.d(TAG, "DB : $realmResult")
-
-            Log.d(TAG,"오늘의 지오펜싱 리스트 : $todayGeofenceList")
-
-        }
-
-
     }
 
-
-
-
-    // AddTodoActivity에서 일정 추가 후 onResum호출을 통해 바로 일정 추가 And Geofencing 추가
-    override fun onResume() {
-        super.onResume()
-
-        Log.d(TAG,"onResume() 시작")
-
-        // 이거 없으면 클릭리스너 작동 X - 11.18
-        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
-
-        var realmResult =
-            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-
-        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
-        if (realmResult.size == 0 ) {
-            add_blank_data(selected_date)
-        }
-
-        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
-        mainBinding.TodoRecyclerView.adapter = myAdapter
-
-
-        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
-        val layout = LinearLayoutManager(this)
-        mainBinding.TodoRecyclerView.layoutManager = layout
-        myAdapter.todo_datas = realmResult
-
-        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
-        myAdapter.Item = find_Item_Count(selected_date)
-
-        /////// Geofencing 추가 코드 //////
-        // geofenceList에 새로 입력받은 값 추가
-        // 새로운 좌표를 입력 받은 경우만 추가
-
-        getTodayGeofencing()
-        if (todayGeofenceList.isNotEmpty()) {
-            addGeofences()    // geofencing 추가
-        }
-
-        // adapter에게 Data가 변했다는 것을 알려줍니다.
-        myAdapter.notifyDataSetChanged()
-    }
-
-    // 뒤로가기 클릭 시
-    override fun onBackPressed() {
-        // 두번 뒤로 가기 클릭으로 종료 명령 시 종료
-        if (doubleBackToExit) {
-            finishAffinity()
-        } else {
-            Toast.makeText(this, "종료하시려면 뒤로가기를 한번 더 눌러주세요.", Toast.LENGTH_SHORT).show()
-            // 1.5초 사이에 뒤로 가기를 한번 더 누를 경우 위의 종료 명령 실행
-            doubleBackToExit = true
-            runDelayed(1500L) {
-                doubleBackToExit = false
-            }
-        }
-    }
-
-
-    fun runDelayed(millis: Long, function: () -> Unit) {
-        Handler(Looper.getMainLooper()).postDelayed(function, millis)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        realm.close()   // 인스턴스 해제
-    }
 
     private fun startTimer() {
         timerTask?.cancel()    // null이 아닐 경우 취소하고 실행

@@ -127,7 +127,6 @@ class MainActivity : AppCompatActivity() {
         initCalendarView()    // 캘린더 뷰에 관한 설정
 
 
-
     }
 
 

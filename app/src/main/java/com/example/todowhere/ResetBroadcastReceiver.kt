@@ -3,6 +3,7 @@ package com.example.todowhere
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.example.todowhere.RealmDB.Todo
 import io.realm.Realm
 import io.realm.kotlin.where
@@ -15,16 +16,16 @@ class ResetBroadcastReceiver: BroadcastReceiver() {
 
     val realm = Realm.getDefaultInstance()
     // 오늘 날짜로 캘린더 객체 생성
-    val calendar: Calendar = Calendar.getInstance()
 
 
-    var today_year = calendar.get(Calendar.YEAR)
-    var today_month = calendar.get(Calendar.MONTH) + 1
-    var today_day = calendar.get(Calendar.DAY_OF_MONTH)
 
     override fun onReceive(context: Context, intent: Intent) {
 
+        Log.d("로그","BroadcastReceiver - onReceive 시작")
+
         val yesterday = intent.getStringExtra("yesterdayDate")
+
+        Log.d("로그","BroadcastReceiver - 받아온 날짜 : $yesterday")
 
         if (yesterday != null) {
             todoAllFinished(yesterday)    // 지나간 할 일들 모두 Finish처리

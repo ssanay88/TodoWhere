@@ -206,6 +206,4 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
     }
 
 
-
-
 }

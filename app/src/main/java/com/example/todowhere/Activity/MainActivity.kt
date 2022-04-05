@@ -451,7 +451,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun addGeofences() {
-        CheckPermission()
+
         geofencingClient.addGeofences(getGeofencingRequest(todayGeofenceList),geofencePendingIntent).run {
             addOnSuccessListener {
                 Toast.makeText(this@MainActivity,"add Success", Toast.LENGTH_SHORT).show()
@@ -614,9 +614,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
-
     /////////////// 권한 관련 함수  /////////////////////
     fun CheckPermission() {
 
@@ -663,12 +660,12 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     // 권한이 명시적으로 거부된 경우( Deny 버튼 )
                     if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        Log.d(TAG,"사용자가 권한 거부")
+                        Log.d(TAG,"FINE_LOCATION 사용자가 권한 거부")
                         requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),FINE_LOCATION_REQUEST_CODE)
                     } else {
                         // 권한을 처음 보거나 다시 묻지 않음을 선택하거나 권한을 허용한 경우 false 리턴
-                        Log.d(TAG,"사용자가 권한 허용")
-                        // 세팅으로 가서 무조건 허용하도록 작성성
+                        Log.d(TAG,"FINE_LOCATION 사용자가 권한 허용")
+                        // 세팅으로 가서 무조건 허용하도록 작성
 
                     }
                 }
@@ -682,12 +679,12 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     // 권한이 거부된 경우( Deny 버튼 )
                     if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                        Log.d(TAG,"사용자가 권한 거부")
+                        Log.d(TAG,"BACKGROUND 사용자가 권한 거부")
                         // requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),FINE_BACKGROUND_REQUEST_CODE)
                         GetPermission()
                     } else {
                         // 권한을 처음 보거나 다시 묻지 않음을 선택하거나 권한을 허용한 경우 false 리턴
-                        Log.d(TAG,"사용자가 권한 허용")
+                        Log.d(TAG,"BACKGROUND 사용자가 권한 허용")
                         // 세팅으로 가서 무조건 허용하도록 작성
                     }
                 }
@@ -710,7 +707,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         builder.setNegativeButton("Later") { dialogInterface, i ->
-            // ignore
+            Toast.makeText(this, "앱을 사용하기 위해선 백그라운드 위치 권한이 필요합니다." , Toast.LENGTH_SHORT).show()
+            finish()    // 앱 종료
+
         }
         val dialog = builder.create()
         dialog.show()
@@ -722,30 +721,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-//    private fun getTodayTodo(Today_Date:String):MutableList<Todo> {
-//
-//        realm.beginTransaction()    // realm 트랜잭션 시작
-//
-//        val realmResult = realm.where(Todo::class.java).contains("id",Today_Date).findAll()
-//        return realmResult.subList(0,realmResult.size)
-//
-//        // slice 와 subList의 차이점
-//        // 둘 다 시작인덱스와 목표 인덱스를 지정하여 원하는 부분을 가져온다
-//        // slice는 원본 리스트의 값들을 복사해서 들고 온다, subList는 원본 리스트를 참고하여 가져오기 때문에 원본 리스트에서
-//        // 원소의 변화가 있을 경우 slice는 변화에 대응하지 않고 이전에 복사한 값 그대로이고 subList는 변경된 인덱스를 그대로 참조합니다.
-//        /*
-//            fun main() {
-//        val myList = mutableListOf(1, 2, 3, 4)
-//        val subList = myList.subList(1, 3)
-//        val sliceList = myList.slice(1..2)
-//        println(subList) // [2, 3]
-//        println(sliceList) // [2, 3]
-//        myList[1] = 5
-//        println(subList) // [5, 3]
-//        println(sliceList) // [2, 3]
-//        }
-//         */
-//    }
 
 }
 

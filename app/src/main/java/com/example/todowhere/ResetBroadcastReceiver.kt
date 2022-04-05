@@ -17,8 +17,6 @@ class ResetBroadcastReceiver: BroadcastReceiver() {
     val realm = Realm.getDefaultInstance()
     // 오늘 날짜로 캘린더 객체 생성
 
-
-
     override fun onReceive(context: Context, intent: Intent) {
 
         Log.d("로그","BroadcastReceiver - onReceive 시작")
@@ -30,7 +28,6 @@ class ResetBroadcastReceiver: BroadcastReceiver() {
         if (yesterday != null) {
             todoAllFinished(yesterday)    // 지나간 할 일들 모두 Finish처리
         }
-        todayTodoAdd()    // 다음날의 할 일들 추가
 
     }
 
@@ -49,10 +46,6 @@ class ResetBroadcastReceiver: BroadcastReceiver() {
 
     }
 
-
-    private fun todayTodoAdd() {
-
-    }
 
 
 }

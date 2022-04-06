@@ -138,6 +138,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG,"onResume() 시작")
         initCalendarView()    // 앱 재실행시 캘린더뷰 설정
+        initAdapter()    // 다시 재개시 어댑터 업데이트
 
 //        // 이거 없으면 클릭리스너 작동 X - 11.18
 //        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -270,7 +271,10 @@ class MainActivity : AppCompatActivity() {
         layout = LinearLayoutManager(this)
         mainBinding.TodoRecyclerView.layoutManager = layout
 
+        myAdapter.todo_datas = realmResult
 
+        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
+        myAdapter.Item = find_Item_Count(selected_date)
 
 
 
@@ -708,7 +712,7 @@ class MainActivity : AppCompatActivity() {
 
         builder.setNegativeButton("Later") { dialogInterface, i ->
             Toast.makeText(this, "앱을 사용하기 위해선 백그라운드 위치 권한이 필요합니다." , Toast.LENGTH_SHORT).show()
-            finish()    // 앱 종료
+            finishAffinity()    // 앱 종료
 
         }
         val dialog = builder.create()

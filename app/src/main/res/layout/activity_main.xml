@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Activity.MainActivity">
 
-
+<!-- https://onlyfor-me-blog.tistory.com/437 캘린더뷰 커스텀 -->
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/CalendarView"
         android:layout_width="0dp"

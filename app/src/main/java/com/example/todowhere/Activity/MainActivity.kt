@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.todowhere.*
+import com.example.todowhere.CalendarDecorator.TodayDecorator
 import com.example.todowhere.RealmDB.Geofencing
 import com.example.todowhere.RealmDB.Todo
 import com.example.todowhere.databinding.ActivityMainBinding
@@ -205,10 +206,17 @@ class MainActivity : AppCompatActivity() {
     // 캘린더뷰에 관한 설정
     private fun initCalendarView() {
 
+        // 데코레이터들 선언
+        val todayDecorator = TodayDecorator(this)    // 오늘 날짜에 표시
+
         selected_date = getDate(selected_year,selected_month,selected_day)
+
 
         mainBinding.CalendarView.setCurrentDate(Date(System.currentTimeMillis()))    // 오늘 날짜로 설정
         mainBinding.CalendarView.setDateSelected(Date(System.currentTimeMillis()),true)    // 오늘 날짜 선택
+
+        // 데코레이터들 추가
+        mainBinding.CalendarView.addDecorators(todayDecorator)
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
         mainBinding.CalendarView.setOnDateChangedListener { widget, date, selected ->   //{ view, year, month, dayOfMonth ->

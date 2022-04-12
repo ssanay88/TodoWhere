@@ -33,11 +33,6 @@
     </style>
 
     <style name="Widget.CalendarView.Custom" parent="android:Widget.CalendarView">
-        <item name="android:focusedMonthDateColor">@android:color/holo_blue_light</item>
-        <item name="android:weekNumberColor">@android:color/holo_red_light</item>
-        <item name="android:selectedWeekBackgroundColor">@android:color/holo_blue_light</item>
-        <item name="android:selectedDateVerticalBar">@android:color/holo_blue_light</item>
-        <item name="android:unfocusedMonthDateColor">@android:color/holo_blue_light</item>
         <item name="android:weekDayTextAppearance">@style/TextAppearance.AppCompat.Medium</item>
         <item name="android:dateTextAppearance">@style/TextAppearance.AppCompat.Medium</item>
     </style>
@@ -52,8 +47,7 @@
 
     <!-- 여기서 요일, 달력 안 숫자들의 폰트 설정을 수행할 수 있다 -->
     <style name="CalenderViewCustom" parent="Theme.AppCompat">
-        <item name="colorAccent">@android:color/holo_red_light</item>
-        <item name="colorPrimary">@android:color/holo_blue_light</item>
+
         <item name="android:textStyle">bold</item>
     </style>
 

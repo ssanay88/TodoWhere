@@ -3,12 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/add_button.xml" value="0.2445" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/address_textview.xml" value="0.2445" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/button_layout.xml" value="0.2445" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/calendar_background.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/delete_button.xml" value="0.2445" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/delete_list_button.xml" value="0.2445" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/ic_outline_cancel_24.xml" value="0.15885416666666666" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/list_background.xml" value="0.29322916666666665" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/map_button.xml" value="0.2445" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/recyclerview_background.xml" value="0.36203703703703705" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/drawable/today_background.xml" value="0.1" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/activity_add_todo.xml" value="0.527736131934033" />
-        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/activity_main.xml" value="0.22514619883040934" />
+        <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/activity_map_pop_up.xml" value="0.184375" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/add_todo.xml" value="0.21240942028985507" />
         <entry key="..\:/Users/82103/AndroidStudioProjcect/TodoWhere/app/src/main/res/layout/map_popup.xml" value="0.17916666666666667" />

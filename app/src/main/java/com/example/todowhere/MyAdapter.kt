@@ -130,9 +130,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         private var delBtn : ImageButton = view.findViewById(R.id.delete_button)
         private var doingEffect : MultiWaveHeader = view.findViewById(R.id.doingEffect)
 
-        init {
-            Log.d(TAG,"MyViewHolder_Update called!!")
-        }
 
         fun bind(item: Todo) {
             // Realm 에서 데이터 불러와서 적용
@@ -157,10 +154,7 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
                     doingEffect.stop()
                 }
 
-
-
             }
-
 
 
             mapBtn.setOnClickListener {
@@ -185,10 +179,6 @@ class MyAdapter(private val context: Context, var Item : Int, var todo_datas : L
         val TAG: String = "로그"
 
         private val addBtn: Button = view.findViewById(R.id.todo_add_button)
-
-        init {
-            Log.d(TAG, "MyViewHolder_Add called!!")
-        }
 
         fun bind() {
             // 추가 버튼 클릭 시 작동

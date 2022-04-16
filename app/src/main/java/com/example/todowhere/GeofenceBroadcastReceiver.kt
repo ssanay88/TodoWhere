@@ -35,7 +35,6 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         Toast.makeText(context,"지오펜싱 시작", Toast.LENGTH_SHORT).show()
 
 
-
         if (geofencingEvent.hasError()) {
             val errorMessage = GeofenceStatusCodes.getStatusCodeString(geofencingEvent.errorCode)
             Log.e("GeofenceBR", errorMessage)

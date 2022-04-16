@@ -54,7 +54,7 @@ ResetWorker 다시 코딩
 
 일정 추가 후 앱 상태 Stop으로 자동 복구 - 필요 없는 기능 삭제 2022 - 02 - 10
 
-앱 아이콘 변경
+앱 아이콘 변경 - 해결
 
  */
 
@@ -141,29 +141,6 @@ class MainActivity : AppCompatActivity() {
         initCalendarView()    // 앱 재실행시 캘린더뷰 설정
         initAdapter()    // 다시 재개시 어댑터 업데이트
 
-//        // 이거 없으면 클릭리스너 작동 X - 11.18
-//        val mainBinding = ActivityMainBinding.inflate(layoutInflater)
-//
-//        var realmResult =
-//            realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
-//
-//        // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
-//        if (realmResult.size == 0 ) {
-//            add_blank_data(selected_date)
-//        }
-//
-//        val myAdapter = MyAdapter(this,find_Item_Count(selected_date),realmResult)
-//        mainBinding.TodoRecyclerView.adapter = myAdapter
-//
-//
-//        // layout을 생성 후 recyclerview의 adapter로 선언해줍니다.
-//        val layout = LinearLayoutManager(this)
-//        mainBinding.TodoRecyclerView.layoutManager = layout
-//
-//        myAdapter.todo_datas = realmResult
-//
-//        // 선언한 adapter 객체의 Item으로 캘린더에서 선택한 날짜의 아이템 수를 다시 입력
-//        myAdapter.Item = find_Item_Count(selected_date)
 
         /////// Geofencing 추가 코드 //////
         // geofenceList에 새로 입력받은 값 추가
@@ -261,6 +238,7 @@ class MainActivity : AppCompatActivity() {
 
     // 어댑터의 클릭 리스너 설정
     private fun initAdapter() {
+
         var realmResult = realm.where<Todo>().contains("id",selected_date).findAll().sort("id",Sort.ASCENDING)
 
         // 해당 날짜에 추가된 일정 아무것도 없을 경우 빈 데이터 추가
@@ -523,7 +501,6 @@ class MainActivity : AppCompatActivity() {
         val resetCalendar: Calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, 3)
-            set(Calendar.MINUTE, 0)
         }
 
         // 정시에 실행하고 반복하는 명령
@@ -539,32 +516,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun resetWorkManager() {
-        val dailyResetRequeset = OneTimeWorkRequestBuilder<ResetWorker>()
-                .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)    // 초기 지연 설정
-            .addTag("Reset")
-            .build()
-
-        WorkManager.getInstance(this).enqueue(dailyResetRequeset)
-
-    }
-
-    // 실행 지연 시간을 설정하는 함수
-    // OneTimeWorkRequest를 등록할 때마다, 아래 함수의 리턴값만큼 대기한 이후부터 시작하도록 하기 위해 사용
-    fun getTimeUsingInWorkRequest() : Long {
-        val currentDate = Calendar.getInstance()
-        val dueDate = Calendar.getInstance()
-
-        dueDate.set(Calendar.HOUR_OF_DAY, 3)
-        dueDate.set(Calendar.MINUTE, 0)
-        dueDate.set(Calendar.SECOND, 0)
-
-        if(dueDate.before(currentDate)) {
-            dueDate.add(Calendar.HOUR_OF_DAY, 24)
-        }
-
-        return dueDate.timeInMillis - currentDate.timeInMillis
-    }
 
     fun deleteFromDB(ID: String) {
 
@@ -591,7 +542,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    // 현제 위치
+    // 현재 위치
     private fun whenUpdateLocation() {
         mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         mLocationListener = object : LocationListener {

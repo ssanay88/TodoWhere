@@ -15,7 +15,8 @@ import io.realm.Realm
 import org.jetbrains.anko.backgroundColor
 
 // 생성자에서 Item은 선택된 날짜별로 표시할 할일들의 수
-class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MyAdapter(private val context: Context, var Item : Int, var todo_datas : List<Todo>)
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
     private val TAG = "로그"

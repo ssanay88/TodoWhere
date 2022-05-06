@@ -1,6 +1,7 @@
 package com.example.todowhere.Activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,8 @@ import com.example.todowhere.RealmDB.Geofencing
 import com.example.todowhere.ReverseGeocodingService
 import com.example.todowhere.RealmDB.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.naver.maps.map.overlay.CircleOverlay
@@ -60,6 +63,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // 현재 좌표를 위한 locationSource 선언
     private lateinit var locationSource: FusedLocationSource
+    // 통합 위치 정보 제공자 클라이언트의 객체 생성, 마지막으로 알려진 위치 가져오기 위해
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -70,6 +75,9 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 현재 좌표값 불러오기
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
+        // 마지막으로 알려진 위치 가져오기
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
 
         // MainActivity 에서 인텐트를 전달받기 위해 선언
         var intent_from_mainactivity = getIntent()
@@ -212,9 +220,12 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         naverMap.minZoom = 11.0
         naverMap.maxZoom = 18.0
 
+        userLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager  // 현재 위치 받아오기용
+        userLocationListener = object : LocationListener {
+            override fun onLocationChanged(p0: Location) {
 
-        // 현재 위치를 받아온다.
-        getUserLocation(naverMap)
+            }
+        }
 
         var checkFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         var checkCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -240,6 +251,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
             selected_Lng = locationSource.lastLocation!!.longitude
         }
 
+        // 현재 위치를 받아온다.
+        getUserLocation(naverMap)
 
 
 
@@ -353,6 +366,7 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 유저의 현재 위치를 반환하는 함수
+    @SuppressLint("MissingPermission")
     private fun getUserLocation(naverMap: NaverMap) {
 
         // 마커 객체 생성 및 지도에 추가
@@ -361,11 +375,8 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
         // 지도에 표시할 원 오버레이 객체
         val circle = CircleOverlay()
 
-
-
-        userLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        userLocationListener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location : Location? ->
                 var lat = 0.0
                 var lng = 0.0
                 if (location != null) {
@@ -396,25 +407,77 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
             }
-        }
 
-        // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
-        naverMap.setOnMapClickListener { pointF, coord ->
-            // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
-            marker.position = LatLng( coord.latitude , coord.longitude )
-            marker.map = naverMap
-            circle.center = LatLng( coord.latitude , coord.longitude )
-            circle.radius = 50.0    // 원 반경 50m
-            circle.outlineWidth = 10
-            circle.outlineColor = GREEN
-            circle.color = 0
-            circle.map = naverMap
-            // 선택된 중심 좌표 값 저장
-            selected_Lat = coord.latitude
-            selected_Lng = coord.longitude
-        }
 
+            // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
+            naverMap.setOnMapClickListener { pointF, coord ->
+                // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
+                marker.position = LatLng( coord.latitude , coord.longitude )
+                marker.map = naverMap
+                circle.center = LatLng( coord.latitude , coord.longitude )
+                circle.radius = 50.0    // 원 반경 50m
+                circle.outlineWidth = 10
+                circle.outlineColor = GREEN
+                circle.color = 0
+                circle.map = naverMap
+                // 선택된 중심 좌표 값 저장
+                selected_Lat = coord.latitude
+                selected_Lng = coord.longitude
+            }
     }
+
+
+
+//        userLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//        userLocationListener = object : LocationListener {
+//            override fun onLocationChanged(location: Location) {
+//                var lat = 0.0
+//                var lng = 0.0
+//                if (location != null) {
+//                    lat = location.latitude
+//                    lng = location.longitude
+//                }
+//
+//                Log.d(TAG,"현재 위치는 $lat , $lng 입니다.")
+//
+//                // 선택 좌표 선언
+//                selected_Lat = lat
+//                selected_Lng = lng
+//
+//                // 지도에 표시 //
+//
+//                // 카메라 현재 위치로 이동
+//                val cameraUpdate = CameraUpdate.scrollTo(LatLng(lat, lng))
+//                naverMap.moveCamera(cameraUpdate)
+//
+//                marker.position = LatLng( lat , lng )
+//                marker.map = naverMap
+//                circle.center = LatLng( lat , lng )
+//                circle.radius = 50.0    // 원 반경 50m
+//                circle.outlineWidth = 10
+//                circle.outlineColor = GREEN
+//                circle.color = 0
+//                circle.map = naverMap
+//
+//
+//            }
+//        }
+//
+//        // 지도가 클릭되면 onMapClick() 콜백 메서드가 호출되며, 파라미터로 클릭된 지점의 화면 좌표와 지도 좌표가 전달됩니다.
+//        naverMap.setOnMapClickListener { pointF, coord ->
+//            // coord.latitude , coord.longitude -> 클릭을 통한 선택 지점의 좌표
+//            marker.position = LatLng( coord.latitude , coord.longitude )
+//            marker.map = naverMap
+//            circle.center = LatLng( coord.latitude , coord.longitude )
+//            circle.radius = 50.0    // 원 반경 50m
+//            circle.outlineWidth = 10
+//            circle.outlineColor = GREEN
+//            circle.color = 0
+//            circle.map = naverMap
+//            // 선택된 중심 좌표 값 저장
+//            selected_Lat = coord.latitude
+//            selected_Lng = coord.longitude
+//        }
 
 
 

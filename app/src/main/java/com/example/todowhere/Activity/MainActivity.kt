@@ -117,7 +117,6 @@ class MainActivity : AppCompatActivity() {
         startTimer()    // 타이머 진행
         resetAt3AM()    // 매일 초기화 알람 실행
         initAdapter()    // 어댑터에 관한 설정
-        initCalendarView()    // 캘린더 뷰에 관한 설정
 
 
     }
@@ -175,10 +174,13 @@ class MainActivity : AppCompatActivity() {
     // 캘린더뷰에 관한 설정
     private fun initCalendarView() {
 
+        mainBinding.CalendarView.removeDecorators()    // 기존 데코레이터 삭제
+
         // 데코레이터들 선언
         val todayDecorator = TodayDecorator(this)    // 오늘 날짜에 표시
 
         selected_date = getDate(selected_year,selected_month,selected_day)
+
 
 
         mainBinding.CalendarView.setCurrentDate(Date(System.currentTimeMillis()))    // 오늘 날짜로 설정
@@ -186,6 +188,7 @@ class MainActivity : AppCompatActivity() {
 
         // 데코레이터들 추가
         mainBinding.CalendarView.addDecorators(todayDecorator)
+
 
         // 캘린더뷰에서 날짜 선택 시 날짜 지정
         mainBinding.CalendarView.setOnDateChangedListener { widget, date, selected ->   //{ view, year, month, dayOfMonth ->
@@ -216,10 +219,6 @@ class MainActivity : AppCompatActivity() {
 
             // adapter에게 Data가 변했다는 것을 알려줍니다.
             myAdapter.notifyDataSetChanged()
-
-//            Log.d(TAG, "선택한 날짜는 $selected_year - ${selected_month} - $selected_day 입니다.")
-//            Log.d(TAG, "선택했을때 시간은 $cur_time_form 입니다.")
-//            Log.d(TAG, "DB : $realmResult")
 
             Log.d(TAG,"오늘의 지오펜싱 리스트 : $todayGeofenceList")
 

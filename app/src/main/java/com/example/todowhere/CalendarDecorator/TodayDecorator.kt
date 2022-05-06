@@ -13,11 +13,12 @@ class TodayDecorator(context: Context): DayViewDecorator {
 
     // 데코레이트를 해야하는가?
     override fun shouldDecorate(day: CalendarDay?): Boolean {
-        return todayDate?.equals(day)    // 비교 날짜가 오늘 날짜와 같으면 true 반환
+        return todayDate.equals(day)    // 비교 날짜가 오늘 날짜와 같으면 true 반환
     }
 
     // 데코레이트 설정
     override fun decorate(view: DayViewFacade?) {
         view?.setBackgroundDrawable(backGroundDrawable)    // 백그라운드 설정
     }
+
 }

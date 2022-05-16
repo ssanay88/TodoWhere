@@ -184,7 +184,11 @@ class AddTodoActivity : AppCompatActivity(), OnMapReadyCallback {
                                     Log.d(TAG,it.name)
                                     Log.d(TAG,"${it.region.area1.name} , ${it.region.area2.name} , ${it.land.name} , ${it.land.number1} ,${it.land.addition0.value}")
                                     addTodoBinding.locationTextView.text =
-                                        it.region.area1.name + it.region.area2.name + it.land.name + it.land.number1 + it.land.addition0.value
+                                        it.region.area1.name + " " +
+                                                it.region.area2.name + " " +
+                                                it.land.name + " " +
+                                                it.land.number1 + " " +
+                                                it.land.addition0.value
 
                                 }
 

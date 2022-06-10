@@ -1,4 +1,4 @@
-package com.example.todowhere
+package com.example.todowhere.service
 
 import com.example.todowhere.DTO.GetAllDto
 import com.naver.maps.geometry.LatLng

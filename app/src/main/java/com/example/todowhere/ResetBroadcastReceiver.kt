@@ -31,7 +31,6 @@ class ResetBroadcastReceiver: BroadcastReceiver() {
 
     }
 
-
     private fun todoAllFinished(date: String) {
         realm.beginTransaction()
 

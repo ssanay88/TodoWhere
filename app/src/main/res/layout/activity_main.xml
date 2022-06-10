@@ -23,7 +23,6 @@
         app:mcv_titleAnimationOrientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:mcv_arrowColor="@color/sky_200"
-
         app:mcv_selectionColor="@color/sky_200" />
 
     <androidx.recyclerview.widget.RecyclerView

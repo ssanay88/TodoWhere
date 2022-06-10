@@ -18,7 +18,7 @@ import com.example.todowhere.BuildConfig
 import com.example.todowhere.DTO.GetAllDto
 import com.example.todowhere.R
 import com.example.todowhere.RealmDB.Geofencing
-import com.example.todowhere.ReverseGeocodingService
+import com.example.todowhere.service.ReverseGeocodingService
 import com.example.todowhere.RealmDB.Todo
 import com.example.todowhere.databinding.ActivityAddTodoBinding
 import com.naver.maps.geometry.LatLng
